@@ -1,0 +1,72 @@
+
+========
+Contents
+========
+
+API folder
+==========
+
+API contains a complete prebuilt set of API components:
+
+    + libgcc_s_seh-1.dll    // place in client exe directory
+    + libstdc++-6.dll       // place in client exe directory
+    + libwinpthread-1.dll   // place in client exe directory
+    + SglxApi.dll           // place in client exe directory
+    + libSglxApi.a       // place in client source directory
+    + SglxApi.h          // place in client source directory
+    + SglxCppClient.cpp  // place in client source directory
+    + SglxCppClient.h    // place in client source directory
+
+Build folder
+============
+
+Note: Building is optional: the API components are prebuilt.
+
+Build contains the Qt project that generates API components as follows:
+
+    + SglxApi.dll        // generated in API directory
+    + libSglxApi.a       // generated in API directory
+    + SglxApi.h          // copied from Build to API
+    + SglxCppClient.cpp  // copied from Build to API
+    + SglxCppClient.h    // copied from Build to API
+
+SglxDemo project
+================
+
+- SglxDemo is a Visual Studio C++ client project demonstrating use of the API:
+
+    SglxDemo/
+        + DemoRemoteAPI.cpp
+        + DemoRemoteAPI.h
+        + ReadMe.txt
+        + resource.h
+        + SglxDemo.cpp
+        + SglxDemo.rc
+        + SglxDemo.vcxproj
+        + SglxDemo.vcxproj.filters
+        + stdafx.cpp
+        + stdafx.h
+        + targetver.h
+    SglxDemo.sln
+
+- demo_get_api.bat copies required files from API to the SglxDemo project.
+- demo_clean.bat removes VS files that can be recovered by building.
+
+Other demo files
+================
+
+These are source files for building a demo client app that doesn't use Visual Studio.
+
+- DemoRemoteAPI.cpp
+- DemoRemoteAPI.h
+
+Help docs
+=========
+
+- Contents.txt
+- GettingStarted.txt
+- Help.txt
+- LICENSE.txt
+- WhatsNew.txt
+
+
