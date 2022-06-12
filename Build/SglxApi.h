@@ -533,8 +533,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecCommon(
 
 // The inverse of sglx_getParamsImecProbe, this sets parameters
 // for a given logical probe. Parameters are a map of
-// name/value pairs. The call will error if a run is currently
-// in progress.
+// name/value pairs. The call will error if file writing
+// is currently in progress.
 //
 // Note: You can set any subset of fields under [SerialNumberToProbe]/SNjjj.
 //
