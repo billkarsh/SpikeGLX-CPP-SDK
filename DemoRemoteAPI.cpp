@@ -90,7 +90,7 @@ void getShankMap()
 
         t_sglxshankmap  map;
 
-        if( sglx_getStreamShankMap( map, S, 2, 0 ) ) {
+        if( sglx_getStreamShankMap( map, S, 0, 0 ) ) {
 
             printf( "ns nc nr ne: %d %d %d %d\n\n", map.ns, map.nc, map.nr, map.ne );
 

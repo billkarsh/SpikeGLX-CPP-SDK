@@ -324,6 +324,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamSaveChans(
     int                 ip );
 
 // Get t_sglxshankmap struct.
+// Only supported for NI stream (js = 0).
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamShankMap(
     t_sglxshankmap  &shankmap,

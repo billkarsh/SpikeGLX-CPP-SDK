@@ -1,4 +1,11 @@
 ==============
+AS OF 20230202
+==============
+
+- sglx_getStreamShankMap can only be used on NI stream (js = 0) because
+imec ShankMaps are for internal use only. They will be replaced by geomMap.
+
+==============
 AS OF 20220101
 ==============
 
