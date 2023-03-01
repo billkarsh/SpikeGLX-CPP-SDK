@@ -38,7 +38,7 @@ sglx_stopRun( S );  // stop run and clean up
 
 The two integer values (js, ip) select a data stream.
 js: stream type: {0=nidq, 1=obx, 2=imec-probe}.
-ip: substream:   {0=nidq (if js=0), 0+=which Onebox or imec probe}.
+ip: substream:   {0=nidq (if js=0), 0+=which OneBox or imec probe}.
 Examples (js, ip):
 (0, 0) = nidq.	// for nidq, ip is arbitrary but zero by convention
 (1, 4) = obx4.
@@ -63,7 +63,7 @@ The above ini files are used to initialize the Configure dialog each time you op
 - Group [DAQSettings]:                GetParams()
 - Group [DAQ_Imec_All]:               GetParamsImecCommon()
 - Group [SerialNumberToProbe]/SNjjj:  GetParamsImecProbe()
-- Group [SerialNumberToOnebox]/SNjjj: GetParamsOnebox()
+- Group [SerialNumberToOneBox]/SNjjj: GetParamsOneBox()
 
 Generally, follow this workflow:
 

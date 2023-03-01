@@ -244,10 +244,10 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecProbe(
     t_sglxconn                          &S,
     int                                 ip );
 
-// Get parameters for given logical Onebox.
+// Get parameters for given logical OneBox.
 // These are a map of name/value pairs.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_getParamsOnebox(
+SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
     std::map<std::string,std::string>   &mstrstr,
     t_sglxconn                          &S,
     int                                 ip );
@@ -332,7 +332,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamShankMap(
     int             js,
     int             ip );
 
-// js = 1: Get Onebox SN and slot.
+// js = 1: Get OneBox SN and slot.
 // js = 2: Get probe  SN and type.
 // SN = serial number string.
 //
@@ -544,14 +544,14 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
     const std::map<std::string,std::string> &mstrstr,
     int                                     ip );
 
-// The inverse of sglx_getParamsOnebox, this sets parameters
-// for a given logical Onebox. Parameters are a map of
+// The inverse of sglx_getParamsOneBox, this sets parameters
+// for a given logical OneBox. Parameters are a map of
 // name/value pairs. The call will error if a run is currently
 // in progress.
 //
-// Note: You can set any subset of fields under [SerialNumberToOnebox]/SNjjj.
+// Note: You can set any subset of fields under [SerialNumberToOneBox]/SNjjj.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_setParamsOnebox(
+SGLX_EXPORT bool SGLX_CALL sglx_setParamsOneBox(
     t_sglxconn                              &S,
     const std::map<std::string,std::string> &mstrstr,
     int                                     ip );

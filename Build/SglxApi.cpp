@@ -341,7 +341,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecProbe(
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_getParamsOnebox(
+SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
     std::map<std::string,std::string>   &mstrstr,
     t_sglxconn                          &S,
     int                                 ip )
@@ -1084,7 +1084,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_setParamsOnebox(
+SGLX_EXPORT bool SGLX_CALL sglx_setParamsOneBox(
     t_sglxconn                              &S,
     const std::map<std::string,std::string> &mstrstr,
     int                                     ip )
