@@ -203,14 +203,16 @@ error:
 //
 // Runs until error or Ctrl-C.
 //
-// To measure latency, immerse the probe in saline and
-// give it a square wave signal (1 mV p-p, 1 Hz). Feed
-// the commanded NI digital output into the sync SMA
-// for that probe. Run this program while SpikeGLX is
-// recording. One can then measure threshold crossing
-// time in a good-looking LF channel vs. level change
-// time on bit 6 of the SY word. We measure the median
-// latency to be 7.8 ms using the Cpp API.
+// To measure closed-loop latency, immerse the probe in
+// saline and give it a square wave signal (1 mV p-p, 1 Hz).
+// We fetch all 384 channels of these data in a remote program.
+// We analyze one of these channels looking for a rising edge.
+// We then react to that threshold crossing by commanding an
+// NI device to make another edge that is sent to the probe's
+// SMA connector as a digital input. Now the separation between
+// the LFP threshold event and the resulting NI event gives a
+// direct readout of closed-loop latency. We measure the median
+// closed-loop latency to be 7.8 ms using the Cpp API.
 //
 void latency_test()
 {
