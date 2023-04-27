@@ -248,10 +248,7 @@ bool Comm::readBinary( void *data, int nBytes, t_sglxconn &S ) noexcept(false)
     if( !nc )
         return error( "readBinary: Invalid handle." );
 
-    uint nrcv = nc->receiveData( data, nBytes );
-
-    if( !nrcv )
-        return error( "readBinary: No bytes received." );
+    nc->receiveData( data, nBytes );
 
     return true;
 }

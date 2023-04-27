@@ -166,12 +166,12 @@ SGLX_EXPORT bool SGLX_CALL sglx_enumDataDir(
 // Get binary stream data as linear array.
 // Samp count = MIN(max_samps,available).
 // Each sample contains N 16-bit channels, N depends upon channel_subset.
-// Data are int16 type.
 // Fetching starts at index start_samp.
 // channel_subset is an array of specific channels to fetch, optionally,
 //      -1 = all acquired channels, or,
 //      -2 = all saved channels.
-// downsample_ratio is an integer; return every Nth sample (default = 1).
+// Data are int16 type.
+// downsample_ratio is an integer (default = 1).
 //
 // Return headCt = index of first sample in matrix, or zero if error.
 //
@@ -188,11 +188,11 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_fetch(
 // Get binary stream data as linear array.
 // Samp count = MIN(max_samps,available).
 // Each sample contains N 16-bit channels, N depends upon channel_subset.
-// Data are int16 type.
 // channel_subset is an array of specific channels to fetch, optionally,
 //      -1 = all acquired channels, or,
 //      -2 = all saved channels.
-// downsample_ratio is an integer; return every Nth sample (default = 1).
+// Data are int16 type.
+// downsample_ratio is an integer (default = 1).
 //
 // Return headCt = index of first sample in matrix, or zero if error.
 //

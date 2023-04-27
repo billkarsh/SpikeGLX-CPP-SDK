@@ -252,24 +252,27 @@ void latency_test()
             if( !(headCt = sglx_fetch( data, S, js, ip, fromCt, 120, channels )) )
                 goto error;
 
-            int tpts = data.size() / nC,
-                diff = data[id + (tpts-1)*nC] - data[id];
+            int tpts = data.size() / nC;
 
-            bool    digOK = true;
+            if( tpts > 1 ) {
 
-            if( diff > thresh && level == 0 ) {
-                level = 1;
-                digOK = sglx_setDigitalOut( S, level, line );
+                int     diff  = data[id + (tpts-1)*nC] - data[id];
+                bool    digOK = true;
+
+                if( diff > thresh && level == 0 ) {
+                    level = 1;
+                    digOK = sglx_setDigitalOut( S, level, line );
+                }
+                else if( diff < -thresh && level == 1 ) {
+                    level = 0;
+                    digOK = sglx_setDigitalOut( S, level, line );
+                }
+
+                if( !digOK )
+                    goto error;
+
+                fromCt = headCt + tpts;
             }
-            else if( diff < -thresh && level == 1 ) {
-                level = 0;
-                digOK = sglx_setDigitalOut( S, level, line );
-            }
-
-            if( !digOK )
-                goto error;
-
-            fromCt = headCt + tpts;
         }
     }
     else {

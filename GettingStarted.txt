@@ -50,4 +50,8 @@ Remote Setup SglxDemo
 
 3. Try some of the examples in 'DemoRemoteAPI.cpp'.
 
+IMPORTANT:
+Only the Release build of this Visual Studio project is compatible with SglxApi.dll.
+The Debug build uses an incompatible version of the C++ standard template library.
+
 

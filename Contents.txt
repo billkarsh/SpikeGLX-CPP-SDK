@@ -35,6 +35,10 @@ SglxDemo project
 
 - SglxDemo is a Visual Studio C++ client project demonstrating use of the API:
 
+IMPORTANT:
+Only the Release build of this Visual Studio project is compatible with SglxApi.dll.
+The Debug build uses an incompatible version of the C++ standard template library.
+
     SglxDemo/
         + DemoRemoteAPI.cpp
         + DemoRemoteAPI.h

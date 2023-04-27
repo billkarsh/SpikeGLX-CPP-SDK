@@ -1,4 +1,10 @@
 ==============
+AS OF 20230411
+==============
+
+- Fecthes returning zero samples do not generate warnings.
+
+==============
 AS OF 20230202
 ==============
 
