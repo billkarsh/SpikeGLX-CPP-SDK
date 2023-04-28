@@ -433,6 +433,19 @@ SGLX_EXPORT bool SGLX_CALL sglx_par2(
     char                op,
     const std::string   &file );
 
+// Set anatomy data string with Pinpoint format:
+// [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)(startpos,endpos,R,G,B,rgnname)…()
+//    - probe-id: SpikeGLX logical probe id.
+//    - shank-id: [0..n-shanks].
+//    - startpos: region start in microns from tip.
+//    - endpos:   region end in microns from tip.
+//    - R,G,B:    region color as RGB, each [0..255].
+//    - rgnname:  region name text.
+//
+SGLX_EXPORT bool SGLX_CALL sglx_setAnatomy_Pinpoint(
+    t_sglxconn          &S,
+    const std::string   &shankdat );
+
 // Set audio output on/off. Note that this command has
 // no effect if not currently running.
 //

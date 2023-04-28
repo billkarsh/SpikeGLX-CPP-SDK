@@ -889,6 +889,19 @@ SGLX_EXPORT bool SGLX_CALL sglx_par2(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL sglx_setAnatomy_Pinpoint(
+    t_sglxconn          &S,
+    const std::string   &shankdat )
+{
+    Comm    C;
+
+    try {
+        return C.doCommand( S, string("SETANATOMYPP ") + S.cpp_get_str(shankdat) );
+    }
+    CATCH()
+}
+
+
 SGLX_EXPORT bool SGLX_CALL sglx_setAudioEnable( t_sglxconn &S, bool enable )
 {
     Comm    C;
