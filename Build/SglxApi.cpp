@@ -371,6 +371,17 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL sglx_getProbeList( std::string &list, t_sglxconn &S )
+{
+    Comm    C;
+
+    try {
+        return C.do1LineQuery( list, S, "GETPROBELIST", false );
+    }
+    CATCH()
+}
+
+
 SGLX_EXPORT bool SGLX_CALL sglx_getRunName( std::string &name, t_sglxconn &S )
 {
     Comm    C;

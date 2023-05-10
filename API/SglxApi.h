@@ -252,6 +252,16 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
     t_sglxconn                          &S,
     int                                 ip );
 
+// Get string with format:
+// (probeID,nShanks,partNumber)()...
+// - A parenthesized entry for each selected probe.
+// - probeID: zero-based integer.
+// - nShanks: integer {1,4}.
+// - partNumber: string, e.g., NP1000.
+// - If no probes, return '()'.
+//
+SGLX_EXPORT bool SGLX_CALL sglx_getProbeList( std::string &list, t_sglxconn &S );
+
 // Get run base name.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getRunName( std::string &name, t_sglxconn &S );
