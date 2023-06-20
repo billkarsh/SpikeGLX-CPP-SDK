@@ -13,7 +13,7 @@ The SDK lets C++ applications communicate with SpikeGLX phase30 versions
 
 ### Who
 
-TheSDK is developed by [Bill Karsh](https://www.janelia.org/people/bill-karsh)
+The SDK is developed by [Bill Karsh](https://www.janelia.org/people/bill-karsh)
 of the [Tim Harris Lab](https://www.janelia.org/lab/harris-lab-apig) at
 HHMI/Janelia Research Campus.
 
