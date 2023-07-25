@@ -1,6 +1,10 @@
 #ifndef SGLXAPI_H
 #define SGLXAPI_H
 
+/* ---------------------------------------------------------------- */
+/* C++ API -------------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
 #include <map>
 #include <string>
 #include <vector>
@@ -155,7 +159,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_consoleHide( t_sglxconn &S );
 //
 SGLX_EXPORT bool SGLX_CALL sglx_consoleShow( t_sglxconn &S );
 
-// Retrieve a listing of files in the ith data directory.
+// Retrieve a listing of files in idir data directory.
 // Get main data directory by setting idir=0 or omitting it.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_enumDataDir(
@@ -213,6 +217,24 @@ SGLX_EXPORT bool SGLX_CALL sglx_getDataDir(
     t_sglxconn  &S,
     int         idir = 0 );
 
+// Get geomMap for given logical imec probe.
+// Returned as a struct of key-value pairs.
+// Header fields:
+//     head_partNumber
+//     head_numShanks
+//     head_shankPitch   ; microns
+//     head_shankWidth   ; microns
+// Channel 5, e.g.:
+//     ch5_s   ; shank index
+//     ch5_x   ; microns from left edge of shank
+//     ch5_z   ; microns from center of tip-most electrode row
+//     ch5_u   ; used-flag (in CAR operations)
+//
+SGLX_EXPORT bool SGLX_CALL sglx_getGeomMap(
+    std::map<std::string,std::string>   &mstrstr,
+    t_sglxconn                          &S,
+    int                                 ip );
+
 // Get gains for given probe and channel.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
@@ -223,21 +245,21 @@ SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
     int         chan );
 
 // Get the most recently used run parameters.
-// These are a map of name/value pairs.
+// These are a map of key-value pairs.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getParams(
     std::map<std::string,std::string>   &mstrstr,
     t_sglxconn                          &S );
 
 // Get imec parameters common to all enabled probes.
-// These are a map of name/value pairs.
+// These are a map of key-value pairs.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecCommon(
     std::map<std::string,std::string>   &mstrstr,
     t_sglxconn                          &S );
 
 // Get imec parameters for given logical probe.
-// These are a map of name/value pairs.
+// These are a map of key-value pairs.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecProbe(
     std::map<std::string,std::string>   &mstrstr,
@@ -245,7 +267,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecProbe(
     int                                 ip );
 
 // Get parameters for given logical OneBox.
-// These are a map of name/value pairs.
+// These are a map of key-value pairs.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
     std::map<std::string,std::string>   &mstrstr,
@@ -462,7 +484,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_setAnatomy_Pinpoint(
 SGLX_EXPORT bool SGLX_CALL sglx_setAudioEnable( t_sglxconn &S, bool enable );
 
 // Set subgroup of parameters for audio-out operation. Parameters
-// are a map of name/value pairs. This call stops current output.
+// are a map of key-value pairs. This call stops current output.
 // Call sglx_setAudioEnable() to restart it.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setAudioParams(
@@ -488,7 +510,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_setDigitalOut(
 
 // If a run is in progress, set metadata to be added to the
 // next output file-set. Metadata must be in the form of a
-// map of name/value pairs.
+// map of key-value pairs.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setMetadata(
     t_sglxconn                              &S,
@@ -533,10 +555,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_setNextFileName(
     const std::string   &name );
 
 // The inverse of sglx_getParams, this sets run parameters.
-// Alternatively, you can pass the parameters to sglx_startRun,
-// which calls this in turn. Run parameters are a map of
-// name/value pairs. The call will error if a run is currently
-// in progress.
+// Run parameters are a map of key-value pairs. The call
+// will error if a run is currently in progress.
 //
 // Note: You can set any subset of [DAQSettings].
 //
@@ -546,7 +566,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParams(
 
 // The inverse of sglx_getParamsImecCommon, this sets parameters
 // common to all enabled probes. Parameters are a map of
-// name/value pairs. The call will error if a run is currently
+// key-value pairs. The call will error if a run is currently
 // in progress.
 //
 // Note: You can set any subset of [DAQ_Imec_All].
@@ -557,7 +577,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecCommon(
 
 // The inverse of sglx_getParamsImecProbe, this sets parameters
 // for a given logical probe. Parameters are a map of
-// name/value pairs. The call will error if file writing
+// key-value pairs. The call will error if file writing
 // is currently in progress.
 //
 // Note: You can set any subset of fields under [SerialNumberToProbe]/SNjjj.
@@ -569,7 +589,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
 
 // The inverse of sglx_getParamsOneBox, this sets parameters
 // for a given logical OneBox. Parameters are a map of
-// name/value pairs. The call will error if a run is currently
+// key-value pairs. The call will error if a run is currently
 // in progress.
 //
 // Note: You can set any subset of fields under [SerialNumberToOneBox]/SNjjj.
@@ -611,7 +631,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_setTriggerOnBeep(
     int                 millisec );
 
 // Start data acquisition run. Last-used parameters remain
-// in effect. An error is flagged if already running.
+// in effect. An error is flagged if already running. The
+// name parameter is optional; set NULL or "" to use existing.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_startRun(
     t_sglxconn          &S,

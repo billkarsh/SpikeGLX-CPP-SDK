@@ -4,6 +4,7 @@ AS OF 20230425
 
 New functions
 -------------
+sglx_getGeomMap
 sglx_getProbeList
 sglx_setAnatomy_Pinpoint
 

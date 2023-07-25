@@ -231,6 +231,36 @@ SGLX_EXPORT bool SGLX_CALL sglx_getDataDir(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL sglx_getGeomMap(
+    std::map<std::string,std::string>   &mstrstr,
+    t_sglxconn                          &S,
+    int                                 ip )
+{
+    S.cpp_zer_mstrstr( mstrstr );
+
+    Comm            C;
+    vector<string>  vs;
+    char            cmd[32];
+    sprintf( cmd, "GETGEOMMAP %d", ip );
+
+    try {
+        C.doNLineQuery( vs, S, cmd, true );
+
+        for( int i = 0, n = vs.size(); i < n; ++i ) {
+            const string    &s = vs[i];
+            int             eq = s.find( '=' );
+            S.cpp_ins_mstrstr(
+                mstrstr,
+                s.substr( 0, eq ).c_str(),
+                s.substr( eq + 1 ).c_str() );
+        }
+
+        return true;
+    }
+    CATCH()
+}
+
+
 SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
     double      &APgain,
     double      &LFgain,
@@ -1243,7 +1273,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_verifySha1(
 
     if( !sglx_isRunning( running, S ) )
         return false;
-    else {
+    else if( running ) {
         S.cpp_ins_str( S.err, "sglx_verifySha1: Can't be used during run." );
         return false;
     }

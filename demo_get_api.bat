@@ -6,7 +6,7 @@ copy API\*.dll sglxDemo\x64\Debug
 copy API\*.dll sglxDemo\x64\Release
 
 copy API\*.a sglxDemo\sglxDemo
-copy API\*.h sglxDemo\sglxDemo
+copy API\S*.h sglxDemo\sglxDemo
 copy API\*.cpp sglxDemo\sglxDemo
 
 
