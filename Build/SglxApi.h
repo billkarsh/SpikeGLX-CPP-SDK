@@ -230,7 +230,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getDataDir(
 //     ch5_z   ; microns from center of tip-most electrode row
 //     ch5_u   ; used-flag (in CAR operations)
 //
-//  Note: Fields are in alphanumeric order!
+//  Note: Fields are in ascending alphanumeric order!
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getGeomMap(
     std::map<std::string,std::string>   &mstrstr,
