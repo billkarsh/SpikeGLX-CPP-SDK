@@ -24,15 +24,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 HEADERS += \
-        Comm.h          \
-        NetClient.h     \
-        SglxApi.h       \
+        C_SglxApi.h         \
+        Comm.h              \
+        NetClient.h         \
+        SglxApi.h           \
+        SglxCppClient.h     \
         Socket.h
 
 SOURCES += \
-        Comm.cpp        \
-        NetClient.cpp   \
-        SglxApi.cpp     \
+        C_SglxApi.cpp       \
+        Comm.cpp            \
+        NetClient.cpp       \
+        SglxApi.cpp         \
+        SglxCppClient.cpp   \
         Socket.cpp
 
 defineReplace(copyToDir) {
@@ -46,11 +50,21 @@ defineReplace(copyToDir) {
 }
 
 win32 {
+    CONFIG  += skip_target_version_ext
     LIBS    += -lWs2_32
-    QMAKE_POST_LINK += $$copyToDir( SglxApi.h SglxCppClient.h SglxCppClient.cpp, $${DESTDIR} )
+    QMAKE_POST_LINK += $$copyToDir( C_SglxApi.h SglxApi.h SglxCppClient.h SglxCppClient.cpp, $${DESTDIR} )
 }
 
 unix {
+    CONFIG += unversioned_libname
     target.path = /usr/lib
     INSTALLS += target
 }
+
+QMAKE_TARGET_COMPANY = Bill Karsh
+QMAKE_TARGET_PRODUCT = SglxApi
+QMAKE_TARGET_DESCRIPTION = SpikeGLX Com Link
+QMAKE_TARGET_COPYRIGHT = (c) 2023, Bill Karsh, All rights reserved
+VERSION = 1.2
+
+
