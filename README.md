@@ -3,13 +3,23 @@ SpikeGLX-CPP-SDK
 
 ### What
 
-The SDK lets C++ applications communicate with SpikeGLX phase30 versions
+The SDK lets remote applications communicate with SpikeGLX phase30 versions
 20220101 and later:
 
 * Set/get parameters.
 * Start/Stop runs.
 * Start/stop writing.
 * Fetch data in real time.
+* Everything you need to integrate SpikeGLX into your workflow.
+
+Explicitly supported in this package:
+
+* C++
+* ANSI C
+* C#
+
+> *Any other language that binds to C or C++ can be used if you provide
+the wrapper calls*.
 
 ### Who
 

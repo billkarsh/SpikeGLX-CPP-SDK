@@ -5,64 +5,67 @@ Contents
 
 API folder
 ==========
-
 API contains a complete prebuilt set of API components:
 
+Always needed for any exe:
     + libgcc_s_seh-1.dll    // place in client exe directory
     + libstdc++-6.dll       // place in client exe directory
     + libwinpthread-1.dll   // place in client exe directory
     + SglxApi.dll           // place in client exe directory
-    + libSglxApi.a       // place in client source directory
-    + SglxApi.h          // place in client source directory
-    + SglxCppClient.cpp  // place in client source directory
-    + SglxCppClient.h    // place in client source directory
+
+Some of these needed depending upon language:
+    + C_SglxApi.h           // add to project
+    + libSglxApi.a          // add to project
+    + SglxApi.h             // add to project
+    + SglxCppClient.cpp     // add to project
+    + SglxCppClient.h       // add to project
 
 Build folder
 ============
-
 Note: Building is optional: the API components are prebuilt.
-
 Build contains the Qt project that generates API components as follows:
 
     + SglxApi.dll        // generated in API directory
     + libSglxApi.a       // generated in API directory
+    + C_SglxApi.h        // copied from Build to API
     + SglxApi.h          // copied from Build to API
     + SglxCppClient.cpp  // copied from Build to API
     + SglxCppClient.h    // copied from Build to API
 
-SglxDemo project
-================
+C folder
+========
+Tools to help build an ANSI C client:
 
-- SglxDemo is a Visual Studio C++ client project demonstrating use of the API:
+    + CreateVisualStudioProject.txt
+    + DemoRemoteAPI.c
+    + DemoRemoteAPI.h
 
-IMPORTANT:
-Only the Release build of this Visual Studio project is compatible with SglxApi.dll.
-The Debug build uses an incompatible version of the C++ standard template library.
+C# folder
+=========
+Tools to help build C# client:
 
-    SglxDemo/
-        + DemoRemoteAPI.cpp
-        + DemoRemoteAPI.h
-        + ReadMe.txt
-        + resource.h
-        + SglxDemo.cpp
-        + SglxDemo.rc
-        + SglxDemo.vcxproj
-        + SglxDemo.vcxproj.filters
-        + stdafx.cpp
-        + stdafx.h
-        + targetver.h
-    SglxDemo.sln
+    + CreateVisualStudioProject.txt
+    + C_Sglx.cs
+    + DemoRemoteAPI.cs
 
-- demo_get_api.bat copies required files from API to the SglxDemo project.
-- demo_clean.bat removes VS files that can be recovered by building.
+CPP folder
+==========
+Tools to help build C++ client:
 
-Other demo files
-================
+    + CreateVisualStudioProject.txt
+    + DemoRemoteAPI.cpp
+    + DemoRemoteAPI.h
 
-These are source files for building a demo client app that doesn't use Visual Studio.
+Python folder
+=============
+Tools to help build Python client:
 
-- DemoRemoteAPI.cpp
-- DemoRemoteAPI.h
+    sglx_pkg:
+        + __init__.py
+        + sglx.py
+        + sglx_demo.py  # equivalent to DemoRemoteAPI
+
+IMPORTANT: Copy the 4 DLLs from the API folder to your sglx_pkg folder.
 
 Help docs
 =========

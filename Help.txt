@@ -2,35 +2,38 @@
 SYNOPSIS
 ========
 
-The SpikeGLX C++ API (SglxApi DLL) accesses the SpikeGLX program via TCP/IP. SpikeGLX and the API can run on the same machine (via loopback socket address 127.0.0.1 and port 4142) or across a network.
+The SpikeGLX API (SglxApi.dll) accesses the SpikeGLX program via TCP/IP. On top of that, our message exchange protocol implements acknowledgement, validation and error reporting. SpikeGLX.exe and the API client can run on the same machine (via loopback socket address 127.0.0.1) or across a network.
 
-The API provides extensive control over a running SpikeGLX process: starting and stopping a run, setting parameters, calling the Par2 and SHA1 tools, and so on.
+The API provides extensive control over a running SpikeGLX process: starting and stopping a run, setting parameters, fetching live data, calling the Par2 and SHA1 tools, and so on. Everything you need to integate SpikeGLX into your workflow.
 
-A session begins when an API client program creates a connection record (S = t_sglxconn), which is then passed to all API functions. All subsequent network communication with the SpikeGLX server process is handled automatically within the DLL.
+The core technology is implemented in C++. All other languages are layered on top of the C++ core. C++ clients will have the lowest possible latency because native data types can be used throughout, which bypasses type conversion and extra data copying.
 
-A connection record (S) is weakly stateful: merely keeping a handle to a network socket. It is ok for the client to create and destroy several of these objects. Each network connection cleans up after itself on the server side after 10 seconds of inactivity. By the way, if your script has paused longer than 10 seconds, and you reuse a handle that has timed out, the API will automatically reestablish a connection and the script will likely continue without problems.
+A session begins when an API client program creates a connection handle, which is then passed to all API functions. All subsequent network communication with the SpikeGLX server process is handled automatically within the DLL.
 
-========
-EXAMPLES
-========
+A connection handle is weakly stateful: merely keeping a handle to a network socket. A network connection cleans up after itself on the server side after 10 seconds of inactivity. By the way, if your script has paused longer than 10 seconds, and you reuse a handle that has timed out, the API will automatically reestablish a connection and the script will likely continue without problems. Note that reestablishing a connection (if needed) may take several tens of milliseconds. You can change the timeout value in the SpikeGLX Command Server Settings window.
 
-t_sglxconn S; // declare a connection object
+The API should support multithreaded clients, as long as each thread or subprocess is using its own connection handle.
 
-sglx_connect_std( S ); // connect to SpikeGLX running on local machine
+============
+C++ EXAMPLES
+============
 
-map<string,string> params; // container for getting params
+void *hSglx = sglx_createHandle_std();  // create a connection handle
+sglx_connect( hSglx );                  // connect to SpikeGLX running on local machine
 
-sglx_getParams( params, S ); // optionally retrieve run params as (key, value) pairs
+cppClient_sglx_get_keyvals  g_kv;       // container for getting params
+sglx_getParams( g_kv, hSglx );          // optionally retrieve run params as (key, value) pairs
 
-map<string,string> params; // container for setting params
-params["niMNChans1"] = "0:5";
-params["niDualDevMode"] = "false";
+cppClient_sglx_set_keyvals  s_kv;       // container for setting params
+s_kv.mstrstr["niMNChans1"] = "0:5";
+s_kv.mstrstr["niDualDevMode"] = "false";
+sglx_setParams( hSglx, s_kv );          // make changes
 
-sglx_setParams( S, params ); // make changes
+sglx_startRun( hSglx );                 // start data acquisition run using last-set params
+sglx_stopRun( hSglx );                  // stop run
 
-sglx_startRun( S ); // start data acquisition run using last-set params
-
-sglx_stopRun( S );  // stop run and clean up
+sglx_close( hSglx );                    // release network resources
+sglx_destroyHandle( hSglx );            // release memory resources
 
 ========
 (js, ip)
@@ -52,7 +55,7 @@ GetParams and SetParams
 Manual Pre-validation
 =====================
 
-You'll find that several of the API functions to get or set run parameters complain if you haven't validated any parameters yet. To validate parameters, visit the Configure dialog in SpikeGLX and make choices for your experiment, then click either 'Run' or 'Verify|Save'. Either of these buttons apply a battery of self-consistency checks to your choices. The most recent set of Configuration settings that have passed all the sanity checks are saved in:
+You'll find that several of the API functions to get or set run parameters complain if you haven't validated any parameters yet. Manual validation is something you need to do only once per launch of the SpikeGLX application, not once per run. To validate parameters, visit the Configure dialog in SpikeGLX and make choices for your experiment, then click either 'Run' or 'Verify|Save'. Either of these buttons apply a battery of self-consistency checks to your choices. The most recent set of Configuration settings that have passed all the sanity checks are saved in:
 
 - 'SpikeGLX/_Configs/daq.ini'
 - 'SpikeGLX/_Calibration/imec_probe_settings.ini'
@@ -67,7 +70,7 @@ The above ini files are used to initialize the Configure dialog each time you op
 
 Generally, follow this workflow:
 
-(1) Start SpikeGLX and make sure its Command Server is listening (you'll see a message to that effect in the Console/Log window).
+(1) Launch SpikeGLX and make sure its Command Server is listening (you'll see a message to that effect in the Console/Log window).
 
 (2) Open the Configure dialog to elect which hardware streams you want to run.
 

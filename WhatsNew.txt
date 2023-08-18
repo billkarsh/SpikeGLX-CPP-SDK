@@ -2,6 +2,15 @@
 AS OF 20230425
 ==============
 
+New methodology
+---------------
+Opaque handles
+void* hSglx = sglx_createHandle();
+sglx_destroyHandle( hSglx );
+sglx_getError( hSglx );
+sglx_connect( hSglx );
+New set and get classes
+
 New functions
 -------------
 sglx_getGeomMap
