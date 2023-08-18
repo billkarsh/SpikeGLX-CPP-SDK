@@ -14,9 +14,9 @@ A connection handle is weakly stateful: merely keeping a handle to a network soc
 
 The API should support multithreaded clients, as long as each thread or subprocess is using its own connection handle.
 
-============
-C++ EXAMPLES
-============
+==========================================
+C++ EXAMPLES (similar for other languages)
+==========================================
 
 void *hSglx = sglx_createHandle_std();  // create a connection handle
 sglx_connect( hSglx );                  // connect to SpikeGLX running on local machine

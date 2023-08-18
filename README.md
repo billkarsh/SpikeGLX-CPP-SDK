@@ -17,6 +17,7 @@ Explicitly supported in this package:
 * C++
 * ANSI C
 * C#
+* Python
 
 > *Any other language that binds to C or C++ can be used if you provide
 the wrapper calls*.
