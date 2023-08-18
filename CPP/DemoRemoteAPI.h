@@ -4,15 +4,15 @@
 
 void justConnect();
 
-void consoleTest();
+void console_test();
 
-void getParams();
+void getParams_test();
 
-void getShankMap();
+void getShankMap_test();
 
-void set_get_userNotes();
+void set_get_userNotes_test();
 
-void plot_NI_1sec();
+void plot_NI_1sec_test();
 
 void latency_test();
 

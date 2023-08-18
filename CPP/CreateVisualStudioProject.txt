@@ -1,0 +1,32 @@
+
+1. Select 'New Project'/'Win32 Console Application'; Name it 'Demo'; use default settings.
+2. In VS Main Menubar, select configuration options: 'Release', 'x64'.
+3. Build the solution (Build/Build Solution), which creates folder: Demo/x64/Release, and Demo.exe.
+4. Into that Release folder place copies of:
+	API/libgcc_s_seh-1.dll
+	API/libstdc++-6.dll
+	API/libwinpthread-1.dll
+	API/SglxApi.dll
+5. Right-click on the Demo project in the Solution window and select Add/Existing:
+	API/libSglxApi.a
+	API/SglxApi.h
+	API/SglxCppClient.cpp
+	API/SglxCppClient.h
+6. Do again, adding:
+	CPP/DemoRemoteAPI.cpp
+	CPP/DemoRemoteAPI.h
+7. In Solution window, select both {DemoRemoteAPI.cpp, SglxCppClient.cpp}, right-click and select Properties.
+	under C/C++/Precompiled Headers
+		Precompiled Header: Not Using Precompiled Headers.
+8. Right-click on the Demo project in the Solution window and get Property Pages.
+	under C/C++/General:
+		Additional Include Directories: add SDK folders {API, CPP}.
+	under Linker/General:
+		Additional Library Directories: add SDK folder {API}.
+9. Edit Demo.cpp to call a demo function:
+	#include "DemoRemoteAPI.h"
+	edit main() to call justConnect();
+10. Build: Build/Build Solution.
+11. Run:   Debug/Start Without Debugging.
+
+

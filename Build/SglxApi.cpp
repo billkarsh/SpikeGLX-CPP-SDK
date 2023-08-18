@@ -7,11 +7,12 @@
 using namespace std;
 
 
-#define CATCH()                                     \
-    catch( const exception &e )                     \
-    {S.cpp_ins_str( S.err,                          \
-    (string(__func__) + ": " + e.what()).c_str() ); \
-    return false;}
+#define HS  reinterpret_cast<t_sglxconn*>(hSglx)
+
+#define CATCH()                                         \
+    catch( const exception &e )                         \
+        {HS->err = string(__func__) + ": " + e.what();  \
+        return false;}
 
 
 //-----------------------------------------------------------
@@ -43,148 +44,141 @@ static double getTime()
 
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_connect(
-    t_sglxconn          &S,
+SGLX_EXPORT void* SGLX_CALL sglx_createHandle(
     Tcpp_zer_str        cpp_zer_str,
-    Tcpp_zer_vi32       cpp_zer_vi32,
-    Tcpp_zer_vdbl       cpp_zer_vdbl,
-    Tcpp_zer_vstr       cpp_zer_vstr,
-    Tcpp_zer_mstrstr    cpp_zer_mstrstr,
-    Tcpp_ins_str        cpp_ins_str,
-    Tcpp_ins_vi32       cpp_ins_vi32,
-    Tcpp_ins_vdbl       cpp_ins_vdbl,
-    Tcpp_ins_vstr       cpp_ins_vstr,
-    Tcpp_ins_mstrstr    cpp_ins_mstrstr,
-    Tcpp_siz_vi16       cpp_siz_vi16,
-    Tcpp_get_str        cpp_get_str,
-    Tcpp_itr_vi32       cpp_itr_vi32,
-    Tcpp_itr_mstrstr    cpp_itr_mstrstr,
-    const std::string   &host,
-    int                 port )
+    Tcpp_set_str        cpp_set_str,
+    Tcpp_get_str        cpp_get_str )
 {
-    S.cpp_zer_str       = cpp_zer_str;
-    S.cpp_zer_vi32      = cpp_zer_vi32;
-    S.cpp_zer_vdbl      = cpp_zer_vdbl;
-    S.cpp_zer_vstr      = cpp_zer_vstr;
-    S.cpp_zer_mstrstr   = cpp_zer_mstrstr;
-    S.cpp_ins_str       = cpp_ins_str;
-    S.cpp_ins_vi32      = cpp_ins_vi32;
-    S.cpp_ins_vdbl      = cpp_ins_vdbl;
-    S.cpp_ins_vstr      = cpp_ins_vstr;
-    S.cpp_ins_mstrstr   = cpp_ins_mstrstr;
-    S.cpp_siz_vi16      = cpp_siz_vi16;
-    S.cpp_get_str       = cpp_get_str;
-    S.cpp_itr_vi32      = cpp_itr_vi32;
-    S.cpp_itr_mstrstr   = cpp_itr_mstrstr;
+    t_sglxconn  *S = new t_sglxconn;
 
-    S.cpp_zer_str( S.vers );
-    S.cpp_ins_str( S.host, S.cpp_get_str(host) );
-    S.port          = port;
-    S.handle        = -1;
-    S.in_checkconn  = false;
+    S->cpp_zer_str      = cpp_zer_str;
+    S->cpp_set_str      = cpp_set_str;
+    S->cpp_get_str      = cpp_get_str;
+
+    return S;
+}
+
+
+SGLX_EXPORT void SGLX_CALL sglx_destroyHandle( void *hSglx )
+{
+    if( hSglx )
+        delete HS;
+}
+
+
+SGLX_EXPORT const char* SGLX_CALL sglx_getError( void *hSglx )
+{
+    return HS->err.c_str();
+}
+
+
+SGLX_EXPORT bool SGLX_CALL sglx_connect(
+    void        *hSglx,
+    const char  *host,
+    int         port )
+{
+    HS->vers.clear();
+    HS->host            = host;
+    HS->port            = port;
+    HS->handle          = -1;
+    HS->in_checkconn    = false;
 
     Comm    C;
 
     try {
-        return C.checkConn( S );
+        return C.checkConn( HS );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_close( t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_close( void *hSglx )
 {
+    if( !hSglx )
+        return true;
+
     Comm    C;
 
     try {
-        C.close( S );
+        C.close( HS );
         return true;
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_consoleHide( t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_consoleHide( void *hSglx )
 {
     Comm    C;
 
     try {
-        return C.doCommand( S, "CONSOLEHIDE" );
+        return C.doCommand( HS, "CONSOLEHIDE" );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_consoleShow( t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_consoleShow( void *hSglx )
 {
     Comm    C;
 
     try {
-        return C.doCommand( S, "CONSOLESHOW" );
+        return C.doCommand( HS, "CONSOLESHOW" );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_enumDataDir(
-    std::vector<std::string>    &vstr,
-    t_sglxconn                  &S,
-    int                         idir )
+    T_sglx_get_strs     &vs,
+    void                *hSglx,
+    int                 idir )
 {
     Comm    C;
     char    cmd[32];
     sprintf( cmd, "ENUMDATADIR %d", idir );
 
     try {
-        return C.doNLineQuery( vstr, S, cmd, false );
+        return C.doNLineQuery( vs, HS, cmd );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT t_ull SGLX_CALL sglx_fetch(
-    std::vector<short>      &data,
-    t_sglxconn              &S,
-    int                     js,
-    int                     ip,
-    t_ull                   start_samp,
-    int                     max_samps,
-    const std::vector<int>  &channel_subset,
-    int                     downsample_ratio )
+SGLX_EXPORT t_ull SGLX_CALL sglx_fetch( T_sglx_fetch &io, void *hSglx, t_ull start_samp )
 {
     Comm    C;
     string  s;
     char    cmd[32];
 
     try {
-        C.checkConn( S );
-        sprintf( cmd, "FETCH %d %d %llu %d ", js, ip, start_samp, max_samps );
+        C.checkConn( HS );
+        sprintf( cmd, "FETCH %d %d %llu %d ", io.js, io.ip, start_samp, io.max_samps );
 
         ostringstream   ss;
-        int             val;
-        void            *itr = 0;
 
-        while( S.cpp_itr_vi32( val, channel_subset, itr ) )
-            ss << val << "#";
+        for( int i = 0; i < io.n_cs; ++i )
+            ss << io.channel_subset[i] << "#";
 
         if( !ss.str().size() )
             ss << "-1#";
 
-        ss << " " << downsample_ratio << "\n";
+        ss << " " << io.downsample << "\n";
 
-        C.sendString( S, cmd + ss.str() );
-        C.read_1s_srvside( s, S );
+        C.sendString( HS, cmd + ss.str() );
+        C.read_1s_srvside( s, HS );
 
         t_ull   headCt;
         int     nchans, nsamps;
         sscanf( s.c_str(), "BINARY_DATA %d %d uint64(%llu)", &nchans, &nsamps, &headCt );
 
-        S.cpp_siz_vi16( data, nchans * nsamps );
-        C.readBinary( &data[0], nchans * nsamps * sizeof(short), S );
-        C.receiveOK( S, "FETCH" );
+        C.readBinary( io._dispatch( io, nchans * nsamps ),
+            nchans * nsamps * sizeof(short), HS );
+
+        C.receiveOK( HS, "FETCH" );
 
         if( !headCt )
-            S.cpp_ins_str( S.err, "sglx_fetch: Stream not running." );
+            HS->cpp_set_str( HS->err, "sglx_fetch: Stream not running." );
 
         return headCt;
     }
@@ -192,32 +186,25 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_fetch(
 }
 
 
-SGLX_EXPORT t_ull SGLX_CALL sglx_fetchLatest(
-    std::vector<short>      &data,
-    t_sglxconn              &S,
-    int                     js,
-    int                     ip,
-    int                     max_samps,
-    const std::vector<int>  &channel_subset,
-    int                     downsample_ratio )
+SGLX_EXPORT t_ull SGLX_CALL sglx_fetchLatest( T_sglx_fetch &io, void *hSglx )
 {
-    t_ull   cur_samps = sglx_getStreamSampleCount( S, js, ip );
+    t_ull   cur_samps = sglx_getStreamSampleCount( HS, io.js, io.ip );
 
     if( !cur_samps )
         return 0;
 
+    int max_samps = io.max_samps;
+
     if( max_samps > cur_samps )
         max_samps = cur_samps;
 
-    return sglx_fetch( data, S, js, ip,
-            cur_samps - max_samps, max_samps,
-            channel_subset, downsample_ratio );
+    return sglx_fetch( io, hSglx, cur_samps - max_samps );
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getDataDir(
     std::string &dir,
-    t_sglxconn  &S,
+    void        *hSglx,
     int         idir )
 {
     Comm    C;
@@ -225,48 +212,34 @@ SGLX_EXPORT bool SGLX_CALL sglx_getDataDir(
     sprintf( cmd, "GETDATADIR %d", idir );
 
     try {
-        return C.do1LineQuery( dir, S, cmd, false );
+        return C.do1LineQuery( dir, HS, cmd, false );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getGeomMap(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S,
-    int                                 ip )
+    T_sglx_get_strs     &kv,
+    void                *hSglx,
+    int                 ip )
 {
-    S.cpp_zer_mstrstr( mstrstr );
-
-    Comm            C;
-    vector<string>  vs;
-    char            cmd[32];
+    Comm    C;
+    char    cmd[32];
     sprintf( cmd, "GETGEOMMAP %d", ip );
 
     try {
-        C.doNLineQuery( vs, S, cmd, true );
-
-        for( int i = 0, n = vs.size(); i < n; ++i ) {
-            const string    &s = vs[i];
-            int             eq = s.find( '=' );
-            S.cpp_ins_mstrstr(
-                mstrstr,
-                s.substr( 0, eq ).c_str(),
-                s.substr( eq + 1 ).c_str() );
-        }
-
-        return true;
+        return C.doNLineQuery( kv, HS, cmd );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
-    double      &APgain,
-    double      &LFgain,
-    t_sglxconn  &S,
-    int         ip,
-    int         chan )
+    double  &APgain,
+    double  &LFgain,
+    void    *hSglx,
+    int     ip,
+    int     chan )
 {
     Comm    C;
     string  s;
@@ -274,12 +247,14 @@ SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
     sprintf( cmd, "GETIMECCHANGAINS %d %d", ip, chan );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        APgain = 0;
+        LFgain = 0;
+        C.do1LineQuery( s, HS, cmd, true );
 
         if( 2 == sscanf( s.c_str(), "%lf %lf", &APgain, &LFgain ) )
             return true;
         else {
-            S.cpp_ins_str( S.err, "sglx_getImecChanGains: Garbled gain string." );
+            HS->cpp_set_str( HS->err, "sglx_getImecChanGains: Garbled gain string." );
             return false;
         }
     }
@@ -288,156 +263,99 @@ SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getParams(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S )
+    T_sglx_get_strs     &kv,
+    void                *hSglx )
 {
-    S.cpp_zer_mstrstr( mstrstr );
-
-    Comm            C;
-    vector<string>  vs;
+    Comm    C;
 
     try {
-        C.doNLineQuery( vs, S, "GETPARAMS", true );
-
-        for( int i = 0, n = vs.size(); i < n; ++i ) {
-            const string    &s = vs[i];
-            int             eq = s.find( '=' );
-            S.cpp_ins_mstrstr(
-                mstrstr,
-                s.substr( 0, eq ).c_str(),
-                s.substr( eq + 1 ).c_str() );
-        }
-
-        return true;
+        return C.doNLineQuery( kv, HS, "GETPARAMS" );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecCommon(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S )
+    T_sglx_get_strs     &kv,
+    void                *hSglx )
 {
-    S.cpp_zer_mstrstr( mstrstr );
-
-    Comm            C;
-    vector<string>  vs;
+    Comm    C;
 
     try {
-        C.doNLineQuery( vs, S, "GETPARAMSIMALL", true );
-
-        for( int i = 0, n = vs.size(); i < n; ++i ) {
-            const string    &s = vs[i];
-            int             eq = s.find( '=' );
-            S.cpp_ins_mstrstr(
-                mstrstr,
-                s.substr( 0, eq ).c_str(),
-                s.substr( eq + 1 ).c_str() );
-        }
-
-        return true;
+        return C.doNLineQuery( kv, HS, "GETPARAMSIMALL" );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecProbe(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S,
-    int                                 ip )
+    T_sglx_get_strs     &kv,
+    void                *hSglx,
+    int                 ip )
 {
-    S.cpp_zer_mstrstr( mstrstr );
-
-    Comm            C;
-    vector<string>  vs;
-    char            cmd[32];
+    Comm    C;
+    char    cmd[32];
     sprintf( cmd, "GETPARAMSIMPRB %d", ip );
 
     try {
-        C.doNLineQuery( vs, S, cmd, true );
-
-        for( int i = 0, n = vs.size(); i < n; ++i ) {
-            const string    &s = vs[i];
-            int             eq = s.find( '=' );
-            S.cpp_ins_mstrstr(
-                mstrstr,
-                s.substr( 0, eq ).c_str(),
-                s.substr( eq + 1 ).c_str() );
-        }
-
-        return true;
+        return C.doNLineQuery( kv, HS, cmd );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S,
-    int                                 ip )
+    T_sglx_get_strs     &kv,
+    void                *hSglx,
+    int                 ip )
 {
-    S.cpp_zer_mstrstr( mstrstr );
-
-    Comm            C;
-    vector<string>  vs;
-    char            cmd[32];
+    Comm    C;
+    char    cmd[32];
     sprintf( cmd, "GETPARAMSOBX %d", ip );
 
     try {
-        C.doNLineQuery( vs, S, cmd, true );
-
-        for( int i = 0, n = vs.size(); i < n; ++i ) {
-            const string    &s = vs[i];
-            int             eq = s.find( '=' );
-            S.cpp_ins_mstrstr(
-                mstrstr,
-                s.substr( 0, eq ).c_str(),
-                s.substr( eq + 1 ).c_str() );
-        }
-
-        return true;
+        return C.doNLineQuery( kv, HS, cmd );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_getProbeList( std::string &list, t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_getProbeList( std::string &list, void *hSglx )
 {
     Comm    C;
 
     try {
-        return C.do1LineQuery( list, S, "GETPROBELIST", false );
+        return C.do1LineQuery( list, HS, "GETPROBELIST", false );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_getRunName( std::string &name, t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_getRunName( std::string &name, void *hSglx )
 {
     Comm    C;
 
     try {
-        return C.do1LineQuery( name, S, "GETRUNNAME", false );
+        return C.do1LineQuery( name, HS, "GETRUNNAME", false );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamAcqChans(
-    std::vector<int>    &vi32,
-    t_sglxconn          &S,
+    T_sglx_get_ints     &vint,
+    void                *hSglx,
     int                 js,
     int                 ip )
 {
-    S.cpp_zer_vi32( vi32 );
-
     Comm    C;
     string  s;
     char    cmd[32];
     sprintf( cmd, "GETSTREAMACQCHANS %d %d", js, ip );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        vint._dispatch( vint, 0, 0 );
+        C.do1LineQuery( s, HS, cmd, true );
 
         const char  *p = s.c_str(),
                     *L = p + strlen( p );
@@ -445,7 +363,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamAcqChans(
         while( p < L ) {
             int i, k;
             if( sscanf( p, "%d%n", &i, &k ) ) {
-                S.cpp_ins_vi32( vi32, i );
+                vint._dispatch( vint, i, 1 );
                 p += k + 1;
             }
         }
@@ -457,9 +375,9 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamAcqChans(
 
 
 SGLX_EXPORT t_ull SGLX_CALL sglx_getStreamFileStart(
-    t_sglxconn  &S,
-    int         js,
-    int         ip )
+    void    *hSglx,
+    int     js,
+    int     ip )
 {
     Comm    C;
     string  s;
@@ -467,12 +385,12 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_getStreamFileStart(
     sprintf( cmd, "GETSTREAMFILESTART %d %d", js, ip );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        C.do1LineQuery( s, HS, cmd, true );
 
         t_ull   start = stoull( s );
 
         if( !start )
-            S.cpp_ins_str( S.err, "sglx_getStreamFileStart: Stream not running." );
+            HS->cpp_set_str( HS->err, "sglx_getStreamFileStart: Stream not running." );
 
         return start;
     }
@@ -481,11 +399,11 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_getStreamFileStart(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamI16ToVolts(
-    double      &mult,
-    t_sglxconn  &S,
-    int         js,
-    int         ip,
-    int         chan )
+    double  &mult,
+    void    *hSglx,
+    int     js,
+    int     ip,
+    int     chan )
 {
     Comm    C;
     string  s;
@@ -494,7 +412,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamI16ToVolts(
 
     try {
         mult = 0;
-        C.do1LineQuery( s, S, cmd, true );
+        C.do1LineQuery( s, HS, cmd, true );
         mult = stod( s );
         return true;
     }
@@ -503,10 +421,10 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamI16ToVolts(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamMaxInt(
-    int         &maxInt,
-    t_sglxconn  &S,
-    int         js,
-    int         ip )
+    int     &maxInt,
+    void    *hSglx,
+    int     js,
+    int     ip )
 {
     Comm    C;
     string  s;
@@ -515,7 +433,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamMaxInt(
 
     try {
         maxInt = 0;
-        C.do1LineQuery( s, S, cmd, true );
+        C.do1LineQuery( s, HS, cmd, true );
         maxInt = stoi( s );
         return true;
     }
@@ -523,7 +441,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamMaxInt(
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_getStreamNP( int &np, t_sglxconn &S, int js )
+SGLX_EXPORT bool SGLX_CALL sglx_getStreamNP( int &np, void *hSglx, int js )
 {
     Comm    C;
     string  s;
@@ -532,7 +450,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamNP( int &np, t_sglxconn &S, int js )
 
     try {
         np = 0;
-        C.do1LineQuery( s, S, cmd, true );
+        C.do1LineQuery( s, HS, cmd, true );
         np = stoi( s );
         return true;
     }
@@ -541,9 +459,9 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamNP( int &np, t_sglxconn &S, int js )
 
 
 SGLX_EXPORT t_ull SGLX_CALL sglx_getStreamSampleCount(
-    t_sglxconn  &S,
-    int         js,
-    int         ip )
+    void    *hSglx,
+    int     js,
+    int     ip )
 {
     Comm    C;
     string  s;
@@ -551,12 +469,12 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_getStreamSampleCount(
     sprintf( cmd, "GETSTREAMSAMPLECOUNT %d %d", js, ip );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        C.do1LineQuery( s, HS, cmd, true );
 
         t_ull   count = stoull( s );
 
         if( !count )
-            S.cpp_ins_str( S.err, "sglx_getStreamSampleCount: Stream not running." );
+            HS->cpp_set_str( HS->err, "sglx_getStreamSampleCount: Stream not running." );
 
         return count;
     }
@@ -565,9 +483,9 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_getStreamSampleCount(
 
 
 SGLX_EXPORT double SGLX_CALL sglx_getStreamSampleRate(
-    t_sglxconn  &S,
-    int         js,
-    int         ip )
+    void    *hSglx,
+    int     js,
+    int     ip )
 {
     Comm    C;
     string  s;
@@ -575,12 +493,12 @@ SGLX_EXPORT double SGLX_CALL sglx_getStreamSampleRate(
     sprintf( cmd, "GETSTREAMSAMPLERATE %d %d", js, ip );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        C.do1LineQuery( s, HS, cmd, true );
 
         double  rate = stod( s );
 
         if( !rate )
-            S.cpp_ins_str( S.err, "sglx_getStreamSampleRate: Stream not running." );
+            HS->cpp_set_str( HS->err, "sglx_getStreamSampleRate: Stream not running." );
 
         return rate;
     }
@@ -589,20 +507,19 @@ SGLX_EXPORT double SGLX_CALL sglx_getStreamSampleRate(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamSaveChans(
-    std::vector<int>    &vi32,
-    t_sglxconn          &S,
+    T_sglx_get_ints     &vint,
+    void                *hSglx,
     int                 js,
     int                 ip )
 {
-    S.cpp_zer_vi32( vi32 );
-
     Comm    C;
     string  s;
     char    cmd[32];
     sprintf( cmd, "GETSTREAMSAVECHANS %d %d", js, ip );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        vint._dispatch( vint, 0, 0 );
+        C.do1LineQuery( s, HS, cmd, true );
 
         const char  *p = s.c_str(),
                     *L = p + strlen( p );
@@ -610,7 +527,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamSaveChans(
         while( p < L ) {
             int i, k;
             if( sscanf( p, "%d%n", &i, &k ) ) {
-                S.cpp_ins_vi32( vi32, i );
+                vint._dispatch( vint, i, 1 );
                 p += k + 1;
             }
         }
@@ -623,7 +540,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamSaveChans(
 
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamShankMap(
     t_sglxshankmap  &shankmap,
-    t_sglxconn      &S,
+    void            *hSglx,
     int             js,
     int             ip )
 {
@@ -632,17 +549,18 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamShankMap(
     char    cmd[32];
 
     try {
-        C.checkConn( S );
+        C.checkConn( HS );
         sprintf( cmd, "GETSTREAMSHANKMAP %d %d\n", js, ip );
-        C.sendString( S, cmd );
-        C.read_1s_srvside( s, S );
+        C.sendString( HS, cmd );
+        C.read_1s_srvside( s, HS );
 
         sscanf( s.c_str(), "SHANKMAP %d %d %d %d",
             &shankmap.ns, &shankmap.nc, &shankmap.nr, &shankmap.ne );
 
-        S.cpp_siz_vi16( shankmap.e, 4*shankmap.ne );
-        C.readBinary( &shankmap.e[0], 4*shankmap.ne * sizeof(short), S );
-        C.receiveOK( S, "GETSTREAMSHANKMAP" );
+        C.readBinary( shankmap._dispatch( shankmap ),
+            shankmap.ne * sizeof(t_sglxshankmap::t_entry), HS );
+
+        C.receiveOK( HS, "GETSTREAMSHANKMAP" );
 
         return true;
     }
@@ -653,30 +571,30 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamShankMap(
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamSN(
     int             &slot_or_type,
     std::string     &SN,
-    t_sglxconn      &S,
+    void            *hSglx,
     int             js,
     int             ip )
 {
-    S.cpp_zer_str( SN );
-
     Comm    C;
     string  s;
     char    cmd[32];
     sprintf( cmd, "GETSTREAMSN %d %d", js, ip );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        slot_or_type = 0;
+        HS->cpp_zer_str( SN );
+        C.do1LineQuery( s, HS, cmd, true );
 
         char    sn[64];
         int     i = -1;
 
         if( 2 == sscanf( s.c_str(), "%[^ ] %d", sn, &i ) ) {
-            S.cpp_ins_str( SN, sn );
+            HS->cpp_set_str( SN, sn );
             slot_or_type = i;
             return true;
         }
         else {
-            S.cpp_ins_str( S.err, "sglx_getStreamSN: Garbled SN string." );
+            HS->cpp_set_str( HS->err, "sglx_getStreamSN: Garbled SN string." );
             return false;
         }
     }
@@ -685,11 +603,11 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamSN(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamVoltageRange(
-    double      &vMin,
-    double      &vMax,
-    t_sglxconn  &S,
-    int         js,
-    int         ip )
+    double  &vMin,
+    double  &vMax,
+    void    *hSglx,
+    int     js,
+    int     ip )
 {
     Comm    C;
     string  s;
@@ -697,12 +615,14 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamVoltageRange(
     sprintf( cmd, "GETSTREAMVOLTAGERANGE %d %d", js, ip );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        vMin = 0;
+        vMax = 0;
+        C.do1LineQuery( s, HS, cmd, true );
 
         if( 2 == sscanf( s.c_str(), "%lf %lf", &vMin, &vMax ) )
             return true;
         else {
-            S.cpp_ins_str( S.err, "sglx_getStreamVoltageRange: Garbled range string." );
+            HS->cpp_set_str( HS->err, "sglx_getStreamVoltageRange: Garbled range string." );
             return false;
         }
     }
@@ -710,39 +630,33 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamVoltageRange(
 }
 
 
-SGLX_EXPORT double SGLX_CALL sglx_getTime( t_sglxconn &S )
+SGLX_EXPORT double SGLX_CALL sglx_getTime( void *hSglx )
 {
     Comm    C;
     string  s;
 
     try {
-        C.do1LineQuery( s, S, "GETTIME", true );
+        C.do1LineQuery( s, HS, "GETTIME", true );
         return stod( s );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_getVersion( std::string &vers, t_sglxconn &S )
+SGLX_EXPORT const char* SGLX_CALL sglx_getVersion( void *hSglx )
 {
-    Comm    C;
-
-    try {
-        C.checkConn( S );
-        S.cpp_ins_str( vers, S.vers.c_str() );
-        return true;
-    }
-    CATCH()
+    return HS->vers.c_str();
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_isConsoleHidden( bool &hidden, t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_isConsoleHidden( bool &hidden, void *hSglx )
 {
     Comm    C;
     string  s;
 
     try {
-        C.do1LineQuery( s, S, "ISCONSOLEHIDDEN", true );
+        hidden = false;
+        C.do1LineQuery( s, HS, "ISCONSOLEHIDDEN", true );
         hidden = stoi( s );
         return true;
     }
@@ -750,13 +664,14 @@ SGLX_EXPORT bool SGLX_CALL sglx_isConsoleHidden( bool &hidden, t_sglxconn &S )
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_isInitialized( bool &ready, t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_isInitialized( bool &ready, void *hSglx )
 {
     Comm    C;
     string  s;
 
     try {
-        C.do1LineQuery( s, S, "ISINITIALIZED", true );
+        ready = false;
+        C.do1LineQuery( s, HS, "ISINITIALIZED", true );
         ready = stoi( s );
         return true;
     }
@@ -764,13 +679,14 @@ SGLX_EXPORT bool SGLX_CALL sglx_isInitialized( bool &ready, t_sglxconn &S )
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_isRunning( bool &running, t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_isRunning( bool &running, void *hSglx )
 {
     Comm    C;
     string  s;
 
     try {
-        C.do1LineQuery( s, S, "ISRUNNING", true );
+        running = false;
+        C.do1LineQuery( s, HS, "ISRUNNING", true );
         running = stoi( s );
         return true;
     }
@@ -778,13 +694,14 @@ SGLX_EXPORT bool SGLX_CALL sglx_isRunning( bool &running, t_sglxconn &S )
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_isSaving( bool &saving, t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_isSaving( bool &saving, void *hSglx )
 {
     Comm    C;
     string  s;
 
     try {
-        C.do1LineQuery( s, S, "ISSAVING", true );
+        saving = false;
+        C.do1LineQuery( s, HS, "ISSAVING", true );
         saving = stoi( s );
         return true;
     }
@@ -793,10 +710,10 @@ SGLX_EXPORT bool SGLX_CALL sglx_isSaving( bool &saving, t_sglxconn &S )
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_isUserOrder(
-    bool        &userOrder,
-    t_sglxconn  &S,
-    int         js,
-    int         ip )
+    bool    &userOrder,
+    void    *hSglx,
+    int     js,
+    int     ip )
 {
     Comm    C;
     string  s;
@@ -804,7 +721,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_isUserOrder(
     sprintf( cmd, "ISUSRORDER %d %d", js, ip );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        userOrder = false;
+        C.do1LineQuery( s, HS, cmd, true );
         userOrder = stoi( s );
         return true;
     }
@@ -813,12 +731,12 @@ SGLX_EXPORT bool SGLX_CALL sglx_isUserOrder(
 
 
 SGLX_EXPORT t_ull SGLX_CALL sglx_mapSample(
-    t_sglxconn  &S,
-    int         dstjs,
-    int         dstip,
-    t_ull       srcSample,
-    int         srcjs,
-    int         srcip )
+    void    *hSglx,
+    int     dstjs,
+    int     dstip,
+    t_ull   srcSample,
+    int     srcjs,
+    int     srcip )
 {
     Comm    C;
     string  s;
@@ -826,12 +744,12 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_mapSample(
     sprintf( cmd, "MAPSAMPLE %d %d %llu %d %d", dstjs, dstip, srcSample, srcjs, srcip );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        C.do1LineQuery( s, HS, cmd, true );
 
         t_ull   dstSample = stoull( s );
 
         if( !dstSample )
-            S.cpp_ins_str( S.err, "sglx_mapSample: Stream not running." );
+            HS->cpp_set_str( HS->err, "sglx_mapSample: Stream not running." );
 
         return dstSample;
     }
@@ -840,7 +758,7 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_mapSample(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_opto_emit(
-    t_sglxconn  &S,
+    void    *hSglx,
     int         ip,
     int         color,
     int         site )
@@ -850,27 +768,26 @@ SGLX_EXPORT bool SGLX_CALL sglx_opto_emit(
     sprintf( cmd, "OPTOEMIT %d %d %d", ip, color, site );
 
     try {
-        return C.doCommand( S, cmd );
+        return C.doCommand( HS, cmd );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_opto_getAttenuations(
-    std::vector<double> &vdbl,
-    t_sglxconn          &S,
+    T_sglx_get_dbls     &vdbl,
+    void                *hSglx,
     int                 ip,
     int                 color )
 {
-    S.cpp_zer_vdbl( vdbl );
-
     Comm    C;
     string  s;
     char    cmd[32];
     sprintf( cmd, "OPTOGETATTENS %d %d", ip, color );
 
     try {
-        C.do1LineQuery( s, S, cmd, true );
+        vdbl._dispatch( vdbl, 0, 0 );
+        C.do1LineQuery( s, HS, cmd, true );
 
         const char  *p = s.c_str(),
                     *L = p + strlen( p );
@@ -879,7 +796,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_opto_getAttenuations(
             double  d;
             int     k;
             if( sscanf( p, "%lf%n", &d, &k ) ) {
-                S.cpp_ins_vdbl( vdbl, d );
+                vdbl._dispatch( vdbl, d, 1 );
                 p += k + 1;
             }
         }
@@ -892,7 +809,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_opto_getAttenuations(
 
 SGLX_EXPORT bool SGLX_CALL sglx_par2(
     void                (SGLX_CALL *callback)(const char *status),
-    t_sglxconn          &S,
+    void                *hSglx,
     char                op,
     const std::string   &file )
 {
@@ -900,23 +817,23 @@ SGLX_EXPORT bool SGLX_CALL sglx_par2(
     char    cmd[32];
     bool    running;
 
-    if( !sglx_isRunning( running, S ) )
+    if( !sglx_isRunning( running, hSglx ) )
         return false;
     else if( running ) {
-        S.cpp_ins_str( S.err, "sglx_par2: Can't be used during run." );
+        HS->cpp_set_str( HS->err, "sglx_par2: Can't be used during run." );
         return false;
     }
 
     try {
-        C.checkConn( S );
+        C.checkConn( HS );
         sprintf( cmd, "PAR2 %c ", op );
-        C.sendString( S, string(cmd) + S.cpp_get_str(file) + "\n" );
+        C.sendString( HS, string(cmd) + HS->cpp_get_str(file) + "\n" );
 
         for(;;) {
 
             string      s;
             const char  *s0;
-            C.read_1s_srvside( s, S );
+            C.read_1s_srvside( s, HS );
             s0 = s.c_str();
 
             if( !strcmp( s0, "OK" ) )
@@ -931,58 +848,57 @@ SGLX_EXPORT bool SGLX_CALL sglx_par2(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setAnatomy_Pinpoint(
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &shankdat )
 {
     Comm    C;
 
     try {
-        return C.doCommand( S, string("SETANATOMYPP ") + S.cpp_get_str(shankdat) );
+        return C.doCommand( HS, string("SETANATOMYPP ") + HS->cpp_get_str(shankdat) );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_setAudioEnable( t_sglxconn &S, bool enable )
+SGLX_EXPORT bool SGLX_CALL sglx_setAudioEnable( void *hSglx, bool enable )
 {
     Comm    C;
     char    cmd[32];
     sprintf( cmd, "SETAUDIOENABLE %d", enable );
 
     try {
-        return C.doCommand( S, cmd );
+        return C.doCommand( HS, cmd );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setAudioParams(
-    t_sglxconn                              &S,
-    const std::string                       &group,
-    const std::map<std::string,std::string> &mstrstr )
+    void                    *hSglx,
+    const std::string       &group,
+    T_sglx_set_keyvals      &kv )
 {
     Comm    C;
 
     try {
-        C.checkConn( S );
-        C.sendString( S, string("SETAUDIOPARAMS ") + S.cpp_get_str(group) + "\n" );
-        C.receiveREADY( S, "SETAUDIOPARAMS" );
+        C.checkConn( HS );
+        C.sendString( HS, string("SETAUDIOPARAMS ") + HS->cpp_get_str(group) + "\n" );
+        C.receiveREADY( HS, "SETAUDIOPARAMS" );
 
-        const char  *key, *val;
-        void        *itr = 0;
+        const char  *key = 0, *val = 0;
 
-        while( S.cpp_itr_mstrstr( key, val, mstrstr, itr ) )
-            C.sendString( S, string(key) + "=" + val + "\n" );
+        while( kv._dispatch( kv, key, val ) )
+            C.sendString( HS, string(key) + "=" + val + "\n" );
 
-        C.sendString( S, "\n" );
-        return C.receiveOK( S, "SETAUDIOPARAMS" );
+        C.sendString( HS, "\n" );
+        return C.receiveOK( HS, "SETAUDIOPARAMS" );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setDataDir(
-    t_sglxconn          &S,
+    void                *hSglx,
     int                 idir,
     const std::string   &dir )
 {
@@ -991,14 +907,14 @@ SGLX_EXPORT bool SGLX_CALL sglx_setDataDir(
     sprintf( cmd, "SETDATADIR %d ", idir );
 
     try {
-        return C.doCommand( S, string(cmd) + S.cpp_get_str(dir) );
+        return C.doCommand( HS, string(cmd) + HS->cpp_get_str(dir) );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setDigitalOut(
-    t_sglxconn          &S,
+    void                *hSglx,
     bool                hi_lo,
     const std::string   &channels )
 {
@@ -1007,257 +923,252 @@ SGLX_EXPORT bool SGLX_CALL sglx_setDigitalOut(
     sprintf( cmd, "SETDIGOUT %d ", hi_lo );
 
     try {
-        return C.doCommand( S, string(cmd) + S.cpp_get_str(channels) );
+        return C.doCommand( HS, string(cmd) + HS->cpp_get_str(channels) );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setMetadata(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr )
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv )
 {
     Comm    C;
 
     try {
-        C.checkConn( S );
-        C.sendString( S, "SETMETADATA\n" );
-        C.receiveREADY( S, "SETMETADATA" );
+        C.checkConn( HS );
+        C.sendString( HS, "SETMETADATA\n" );
+        C.receiveREADY( HS, "SETMETADATA" );
 
-        const char  *key, *val;
-        void        *itr = 0;
+        const char  *key = 0, *val = 0;
 
-        while( S.cpp_itr_mstrstr( key, val, mstrstr, itr ) )
-            C.sendString( S, string(key) + "=" + val + "\n" );
+        while( kv._dispatch( kv, key, val ) )
+            C.sendString( HS, string(key) + "=" + val + "\n" );
 
-        C.sendString( S, "\n" );
-        return C.receiveOK( S, "SETMETADATA" );
+        C.sendString( HS, "\n" );
+        return C.receiveOK( HS, "SETMETADATA" );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_setMultiDriveEnable( t_sglxconn &S, bool enable )
+SGLX_EXPORT bool SGLX_CALL sglx_setMultiDriveEnable( void *hSglx, bool enable )
 {
     Comm    C;
     char    cmd[32];
     sprintf( cmd, "SETMULTIDRIVEENABLE %d", enable );
 
     try {
-        return C.doCommand( S, cmd );
+        return C.doCommand( HS, cmd );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setNextFileName(
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &name )
 {
     Comm    C;
 
     try {
-        return C.doCommand( S, string("SETNEXTFILENAME ") + S.cpp_get_str(name) );
+        return C.doCommand( HS, string("SETNEXTFILENAME ") + HS->cpp_get_str(name) );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setParams(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr )
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv )
 {
     Comm    C;
 
     try {
-        C.checkConn( S );
-        C.sendString( S, "SETPARAMS\n" );
-        C.receiveREADY( S, "SETPARAMS" );
+        C.checkConn( HS );
+        C.sendString( HS, "SETPARAMS\n" );
+        C.receiveREADY( HS, "SETPARAMS" );
 
-        const char  *key, *val;
-        void        *itr = 0;
+        const char  *key = 0, *val = 0;
 
-        while( S.cpp_itr_mstrstr( key, val, mstrstr, itr ) )
-            C.sendString( S, string(key) + "=" + val + "\n" );
+        while( kv._dispatch( kv, key, val ) )
+            C.sendString( HS, string(key) + "=" + val + "\n" );
 
-        C.sendString( S, "\n" );
-        return C.receiveOK( S, "SETPARAMS" );
+        C.sendString( HS, "\n" );
+        return C.receiveOK( HS, "SETPARAMS" );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecCommon(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr )
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv )
 {
     Comm    C;
 
     try {
-        C.checkConn( S );
-        C.sendString( S, "SETPARAMSIMALL\n" );
-        C.receiveREADY( S, "SETPARAMSIMALL" );
+        C.checkConn( HS );
+        C.sendString( HS, "SETPARAMSIMALL\n" );
+        C.receiveREADY( HS, "SETPARAMSIMALL" );
 
-        const char  *key, *val;
-        void        *itr = 0;
+        const char  *key = 0, *val = 0;
 
-        while( S.cpp_itr_mstrstr( key, val, mstrstr, itr ) )
-            C.sendString( S, string(key) + "=" + val + "\n" );
+        while( kv._dispatch( kv, key, val ) )
+            C.sendString( HS, string(key) + "=" + val + "\n" );
 
-        C.sendString( S, "\n" );
-        return C.receiveOK( S, "SETPARAMSIMALL" );
+        C.sendString( HS, "\n" );
+        return C.receiveOK( HS, "SETPARAMSIMALL" );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr,
-    int                                     ip )
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv,
+    int                     ip )
 {
     Comm    C;
     char    cmd[32];
 
     try {
-        C.checkConn( S );
+        C.checkConn( HS );
         sprintf( cmd, "SETPARAMSIMPRB %d\n", ip );
-        C.sendString( S, cmd );
-        C.receiveREADY( S, "SETPARAMSIMPRB" );
+        C.sendString( HS, cmd );
+        C.receiveREADY( HS, "SETPARAMSIMPRB" );
 
-        const char  *key, *val;
-        void        *itr = 0;
+        const char  *key = 0, *val = 0;
 
-        while( S.cpp_itr_mstrstr( key, val, mstrstr, itr ) )
-            C.sendString( S, string(key) + "=" + val + "\n" );
+        while( kv._dispatch( kv, key, val ) )
+            C.sendString( HS, string(key) + "=" + val + "\n" );
 
-        C.sendString( S, "\n" );
-        return C.receiveOK( S, "SETPARAMSIMPRB" );
+        C.sendString( HS, "\n" );
+        return C.receiveOK( HS, "SETPARAMSIMPRB" );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsOneBox(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr,
-    int                                     ip )
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv,
+    int                     ip )
 {
     Comm    C;
     char    cmd[32];
 
     try {
-        C.checkConn( S );
+        C.checkConn( HS );
         sprintf( cmd, "SETPARAMSOBX %d\n", ip );
-        C.sendString( S, cmd );
-        C.receiveREADY( S, "SETPARAMSOBX" );
+        C.sendString( HS, cmd );
+        C.receiveREADY( HS, "SETPARAMSOBX" );
 
-        const char  *key, *val;
-        void        *itr = 0;
+        const char  *key = 0, *val = 0;
 
-        while( S.cpp_itr_mstrstr( key, val, mstrstr, itr ) )
-            C.sendString( S, string(key) + "=" + val + "\n" );
+        while( kv._dispatch( kv, key, val ) )
+            C.sendString( HS, string(key) + "=" + val + "\n" );
 
-        C.sendString( S, "\n" );
-        return C.receiveOK( S, "SETPARAMSOBX" );
+        C.sendString( HS, "\n" );
+        return C.receiveOK( HS, "SETPARAMSOBX" );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_setRecordingEnable( t_sglxconn &S, bool enable )
+SGLX_EXPORT bool SGLX_CALL sglx_setRecordingEnable( void *hSglx, bool enable )
 {
     Comm    C;
     char    cmd[32];
     sprintf( cmd, "SETRECORDENAB %d", enable );
 
     try {
-        return C.doCommand( S, cmd );
+        return C.doCommand( HS, cmd );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setRunName(
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &name )
 {
     Comm    C;
 
     try {
-        return C.doCommand( S, string("SETRUNNAME ") + S.cpp_get_str(name) );
+        return C.doCommand( HS, string("SETRUNNAME ") + HS->cpp_get_str(name) );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setTriggerOffBeep(
-    t_sglxconn          &S,
-    int                 hertz,
-    int                 millisec )
+    void    *hSglx,
+    int     hertz,
+    int     millisec )
 {
     Comm    C;
     char    cmd[64];
     sprintf( cmd, "SETTRIGGEROFFBEEP %d %d", hertz, millisec );
 
     try {
-        return C.doCommand( S, cmd );
+        return C.doCommand( HS, cmd );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setTriggerOnBeep(
-    t_sglxconn          &S,
-    int                 hertz,
-    int                 millisec )
+    void    *hSglx,
+    int     hertz,
+    int     millisec )
 {
     Comm    C;
     char    cmd[64];
     sprintf( cmd, "SETTRIGGERONBEEP %d %d", hertz, millisec );
 
     try {
-        return C.doCommand( S, cmd );
+        return C.doCommand( HS, cmd );
     }
     CATCH()
 }
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_startRun(
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &name )
 {
-    if( S.cpp_get_str(name)[0] && !sglx_setRunName( S, name ) )
+    if( HS->cpp_get_str(name)[0] && !sglx_setRunName( HS, name ) )
         return false;
 
     Comm    C;
 
     try {
-        return C.doCommand( S, "STARTRUN" );
+        return C.doCommand( HS, "STARTRUN" );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_stopRun( t_sglxconn &S )
+SGLX_EXPORT bool SGLX_CALL sglx_stopRun( void *hSglx )
 {
     Comm    C;
 
     try {
-        return C.doCommand( S, "STOPRUN" );
+        return C.doCommand( HS, "STOPRUN" );
     }
     CATCH()
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_triggerGT( t_sglxconn &S, int g, int t )
+SGLX_EXPORT bool SGLX_CALL sglx_triggerGT( void *hSglx, int g, int t )
 {
     Comm    C;
     char    cmd[32];
     sprintf( cmd, "TRIGGERGT %d %d", g, t );
 
     try {
-        return C.doCommand( S, cmd );
+        return C.doCommand( HS, cmd );
     }
     CATCH()
 }
@@ -1265,28 +1176,28 @@ SGLX_EXPORT bool SGLX_CALL sglx_triggerGT( t_sglxconn &S, int g, int t )
 
 SGLX_EXPORT bool SGLX_CALL sglx_verifySha1(
     void                (SGLX_CALL *callback)(const char *status),
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &filename )
 {
     Comm    C;
     bool    running;
 
-    if( !sglx_isRunning( running, S ) )
+    if( !sglx_isRunning( running, hSglx ) )
         return false;
     else if( running ) {
-        S.cpp_ins_str( S.err, "sglx_verifySha1: Can't be used during run." );
+        HS->cpp_set_str( HS->err, "sglx_verifySha1: Can't be used during run." );
         return false;
     }
 
     try {
-        C.checkConn( S );
-        C.sendString( S, string("VERIFYSHA1 ") + S.cpp_get_str(filename) + "\n" );
+        C.checkConn( HS );
+        C.sendString( HS, string("VERIFYSHA1 ") + HS->cpp_get_str(filename) + "\n" );
 
         for(;;) {
 
             string      s;
             const char  *s0;
-            C.read_1s_srvside( s, S );
+            C.read_1s_srvside( s, HS );
             s0 = s.c_str();
 
             if( !strcmp( s0, "OK" ) )

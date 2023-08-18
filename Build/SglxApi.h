@@ -27,39 +27,169 @@ extern "C" {
 
 // clear client container
 typedef void (SGLX_CALL *Tcpp_zer_str)( std::string &str );
-typedef void (SGLX_CALL *Tcpp_zer_vi32)( std::vector<int> &vi32 );
-typedef void (SGLX_CALL *Tcpp_zer_vdbl)( std::vector<double> &vdbl );
-typedef void (SGLX_CALL *Tcpp_zer_vstr)( std::vector<std::string> &vsstr );
-typedef void (SGLX_CALL *Tcpp_zer_mstrstr)( std::map<std::string,std::string> &mstrstr );
 
 // insert into client container
-typedef void (SGLX_CALL *Tcpp_ins_str)( std::string &str, const char *data );
-typedef void (SGLX_CALL *Tcpp_ins_vi32)( std::vector<int> &vi32, int data );
-typedef void (SGLX_CALL *Tcpp_ins_vdbl)( std::vector<double> &vdbl, double data );
-typedef void (SGLX_CALL *Tcpp_ins_vstr)( std::vector<std::string> &vstr, const char *data );
-typedef void (SGLX_CALL *Tcpp_ins_mstrstr)( std::map<std::string,std::string> &mstrstr, const char *key, const char *val );
-
-// resize client container
-typedef void (SGLX_CALL *Tcpp_siz_vi16)( std::vector<short> &vi16, int n );
+typedef void (SGLX_CALL *Tcpp_set_str)( std::string &str, const char *data );
 
 // get C-string from client container
 typedef const char* (SGLX_CALL *Tcpp_get_str)( const std::string &str );
 
-// Iterate through vector:
-// Server sets opaque iterator to zero on first call;
-// itr then managed by this function thereafter.
-// Return true if another val available.
-typedef bool (SGLX_CALL *Tcpp_itr_vi32)( int &val, const std::vector<int> &vi32, void* &itr );
+/* ---------------------------------------------------------------- */
+/* Client-side functors ------------------------------------------- */
+/* ---------------------------------------------------------------- */
 
-// Iterate through map:
-// Server sets opaque iterator to zero on first call;
-// itr then managed by this function thereafter.
-// Return true if another (key,val) pair available.
-typedef bool (SGLX_CALL *Tcpp_itr_mstrstr)(
-    const char*                             &key,
-    const char*                             &val,
-    const std::map<std::string,std::string> &mstrstr,
-    void*                                   &itr );
+// For functions that get (API -> client) an array of strings.
+//
+// This API base class defines a method to give, to the client,
+// one string at a time. The data are delivered as C-strings.
+// The client's subclass can do whatever it wants with received
+// strings. If the client is seeking (key,value) pairs, which have
+// the form 'key=value', then the client may elect to split the
+// data into substrings.
+// - API calls set_str( "" ) to clear client data.
+// - API calls set_str( string ) to set each pair.
+//
+// Clients can maintain data in their derived class
+// in any desired form. Our examples use std::vector
+// for whole strings, and std::map for (key,value).
+//
+struct T_sglx_get_strs {
+    T_sglx_get_strs();
+    virtual ~T_sglx_get_strs()  {}
+    virtual void set_str( const char *s ) = 0;
+    static void SGLX_CALL dispatch( T_sglx_get_strs &u, const char *s );
+    void (SGLX_CALL *_dispatch)( T_sglx_get_strs &u, const char *s );
+};
+
+// For functions that get (API -> client) an array of ints.
+//
+// This API base class defines a method to give, to the client,
+// one int at a time.
+// - API calls set_val( -, 0 ) to clear client data.
+// - API calls set_val( v, 1 ) to set each val.
+//
+// Clients can maintain data in their derived class
+// in any desired form. Our example uses std::vector.
+//
+struct T_sglx_get_ints {
+    T_sglx_get_ints();
+    virtual ~T_sglx_get_ints()  {}
+    virtual void set_val( int val, int flag ) = 0;
+    static void SGLX_CALL dispatch( T_sglx_get_ints &u, int val, int flag );
+    void (SGLX_CALL *_dispatch)( T_sglx_get_ints &u, int val, int flag );
+};
+
+// For functions that get (API -> client) an array of doubles.
+//
+// This API base class defines a method to give, to the client,
+// one double at a time.
+// - API calls set_val( -, 0 ) to clear client data.
+// - API calls set_val( v, 1 ) to set each val.
+//
+// Clients can maintain data in their derived class
+// in any desired form. Our example uses std::vector.
+//
+struct T_sglx_get_dbls {
+    T_sglx_get_dbls();
+    virtual ~T_sglx_get_dbls()  {}
+    virtual void set_val( double val, int flag ) = 0;
+    static void SGLX_CALL dispatch( T_sglx_get_dbls &u, double val, int flag );
+    void (SGLX_CALL *_dispatch)( T_sglx_get_dbls &u, double val, int flag );
+};
+
+// For functions that set (client -> API) an array of int32.
+//
+// This API base class defines a method to get, from the client,
+// one int at a time:
+// - API calls get_int( j ) to get jth.
+// - Return true if int exists.
+//
+// Clients can maintain data in their derived class
+// in any desired form. Our example uses std::vector.
+//
+struct T_sglx_set_ints {
+    T_sglx_set_ints();
+    virtual ~T_sglx_set_ints()  {}
+    virtual bool get_int( int &val, int j ) = 0;
+    static bool SGLX_CALL dispatch( T_sglx_set_ints &u, int &val, int j );
+    bool (SGLX_CALL *_dispatch)( T_sglx_set_ints &u, int &val, int j );
+};
+
+// For functions that set (client -> API) (key,value) pairs.
+//
+// This API base class defines a method to get, from the client,
+// one (key,value) pair at a time:
+// - API calls get_pair( 0, 0 ) to get first pair.
+// - API calls get_pair( key, val ) to get next pair.
+// - Return true if pair exists.
+//
+// Clients can maintain (key,value) pairs in their derived class
+// in any desired form. Our example uses std::map.
+//
+struct T_sglx_set_keyvals {
+    T_sglx_set_keyvals();
+    virtual ~T_sglx_set_keyvals()   {}
+    virtual bool get_pair( const char* &key, const char* &val ) = 0;
+    static bool SGLX_CALL dispatch( T_sglx_set_keyvals &u, const char* &key, const char* &val );
+    bool (SGLX_CALL *_dispatch)( T_sglx_set_keyvals &u, const char* &key, const char* &val );
+};
+
+// For use with the data fetching functions.
+//
+// On entry to a fetch the client will have set each of the input fields.
+// - channel_subset is an array of specific channels to fetch, optionally,
+//      channel_subset[0] = -1 = all acquired channels, or,
+//      channel_subset[0] = -2 = all saved channels.
+// - n_cs       = number of channels in subset.
+// - Samp count = MIN(max_samps,available).
+// - Fetch every (downsample)th sample (1 = all samples).
+// - (js, ip)   = stream selectors.
+//
+// On exit:
+// The API calls base_addr during the fetch, whereupon the the client
+// should make sure storage is allocated for (nshort) items and the base
+// address of that storage is returned. See sglx_fetch.
+//
+struct T_sglx_fetch {
+    // client input
+    const int   *channel_subset;
+    int         n_cs,
+                max_samps,
+                downsample;
+    short       js,
+                ip;
+    T_sglx_fetch();
+    virtual ~T_sglx_fetch()  {}
+    virtual short* base_addr( int nshort ) = 0;
+    static short* SGLX_CALL dispatch( T_sglx_fetch &u, int nshort );
+    short* (SGLX_CALL *_dispatch)( T_sglx_fetch &u, int nshort );
+};
+
+// For functions that get (API -> client) a shankMap.
+//
+// This API base class defines a method to give, to the client,
+// all of the packed entries in one call.
+// - First, API sets the header values {ne, ns, nc, nr}.
+// - Then API calls base_addr(), whereupon, the client should
+// allocate storage of size t_entry[ne] and return the base
+// address of that storage.
+//
+// Clients can maintain data in their derived class
+// in any desired form. Our example uses std::vector.
+//
+struct t_sglxshankmap {
+    struct t_entry {
+        // shank, col, row, used
+        short s, c, r, u;
+    };
+    // Header: N {entries, shanks, cols, rows}
+    int ne, ns, nc, nr;
+    t_sglxshankmap();
+    virtual ~t_sglxshankmap()   {}
+    virtual t_entry* base_addr() = 0;
+    static t_entry* SGLX_CALL dispatch( t_sglxshankmap &u );
+    t_entry* (SGLX_CALL *_dispatch)( t_sglxshankmap &u );
+};
 
 /* ---------------------------------------------------------------- */
 /* Types ---------------------------------------------------------- */
@@ -67,105 +197,102 @@ typedef bool (SGLX_CALL *Tcpp_itr_mstrstr)(
 
 typedef unsigned long long t_ull;
 
+/* ---------------------------------------------------------------- */
+/* Private server-side handle ------------------------------------- */
+/* ---------------------------------------------------------------- */
+
 struct t_sglxconn {
+    // C++ client container helpers
     Tcpp_zer_str        cpp_zer_str;
-    Tcpp_zer_vi32       cpp_zer_vi32;
-    Tcpp_zer_vdbl       cpp_zer_vdbl;
-    Tcpp_zer_vstr       cpp_zer_vstr;
-    Tcpp_zer_mstrstr    cpp_zer_mstrstr;
-    Tcpp_ins_str        cpp_ins_str;
-    Tcpp_ins_vi32       cpp_ins_vi32;
-    Tcpp_ins_vdbl       cpp_ins_vdbl;
-    Tcpp_ins_vstr       cpp_ins_vstr;
-    Tcpp_ins_mstrstr    cpp_ins_mstrstr;
-    Tcpp_siz_vi16       cpp_siz_vi16;
+    Tcpp_set_str        cpp_set_str;
     Tcpp_get_str        cpp_get_str;
-    Tcpp_itr_vi32       cpp_itr_vi32;
-    Tcpp_itr_mstrstr    cpp_itr_mstrstr;
+
+    // Connection state
     std::string         err,
                         vers,
                         host;
     int                 port,
                         handle;
     bool                in_checkconn;
-};
 
-struct t_sglxshankmap {
-    struct t_entry {
-        // shank, col, row, used
-        short s, c, r, u;
-    };
-    // N {entries, shanks, cols, rows}
-    int ne, ns, nc, nr;
-    // entries packed end-to-end
-    std::vector<short>  e;
-    // start of ith entry
-    const t_entry* e_i( int i )
-        {return reinterpret_cast<t_entry*>(&e[4*i]);}
+    // C client data storage
+    std::string                         xstr;
+    std::vector<int>                    xvint;
+    std::vector<short>                  xvi16;
+    std::vector<double>                 xvdbl;
+    std::vector<std::string>            xvstr;
+    std::map<std::string,std::string>   xmstrstr;
 };
 
 /* ---------------------------------------------------------------- */
 /* Usage ---------------------------------------------------------- */
 /* ---------------------------------------------------------------- */
 
-// A client application first connects to the server with either:
-// - sglx_connect()         (your custom container callbacks), or,
-// - sglx_connect_std()     (installs our client-side callbacks).
+// A client application first creates a connection handle with either:
+// - sglx_createHandle()        (your custom container callbacks), or,
+// - sglx_createHandle_std()    (installs our client-side callbacks).
 //
-// The t_sglxconn connection record can then be passed to any of
-// the API functions. When done, the client should call sglx_close().
+// The handle can then be passed to any of the API functions.
+// When done, the client should call
+// - sglx_close(), and,
+// - sglx_destroyHandle().
 //
 // Almost all functions return either true=SUCCESS, or false=FAIL.
-// The reason for the most recent failure is available in S.err.
+// Get the reason for the most recent failure with sglx_getError().
 
 /* ---------------------------------------------------------------- */
 /* Functions ------------------------------------------------------ */
 /* ---------------------------------------------------------------- */
 
+// Create a new connection handle to be passed to sglx_connect()
+// and to all subsequent API calls. This call allocates memory
+// owned by the DLL. Release it with sglx_destroyHandle() when
+// you are completely done with the connection.
+//
+// The returned handle is an opaque (void*).
+//
+SGLX_EXPORT void* SGLX_CALL sglx_createHandle(
+    Tcpp_zer_str        cpp_zer_str,
+    Tcpp_set_str        cpp_set_str,
+    Tcpp_get_str        cpp_get_str );
+
+// Destroy handle and release memory resources.
+//
+SGLX_EXPORT void SGLX_CALL sglx_destroyHandle( void *hSglx );
+
+// Get latest error message.
+//
+SGLX_EXPORT const char* SGLX_CALL sglx_getError( void *hSglx );
+
 // Connect to SpikeGLX server.
-// Fill in connection record.
 //
 // Client containers must be accessed by the client (calling app).
 // Recommended code for these methods is provided in SglxCppClient.cpp.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_connect(
-    t_sglxconn          &S,
-    Tcpp_zer_str        cpp_zer_str,
-    Tcpp_zer_vi32       cpp_zer_vi32,
-    Tcpp_zer_vdbl       cpp_zer_vdbl,
-    Tcpp_zer_vstr       cpp_zer_vstr,
-    Tcpp_zer_mstrstr    cpp_zer_mstrstr,
-    Tcpp_ins_str        cpp_ins_str,
-    Tcpp_ins_vi32       cpp_ins_vi32,
-    Tcpp_ins_vdbl       cpp_ins_vdbl,
-    Tcpp_ins_vstr       cpp_ins_vstr,
-    Tcpp_ins_mstrstr    cpp_ins_mstrstr,
-    Tcpp_siz_vi16       cpp_siz_vi16,
-    Tcpp_get_str        cpp_get_str,
-    Tcpp_itr_vi32       cpp_itr_vi32,
-    Tcpp_itr_mstrstr    cpp_itr_mstrstr,
-    const std::string   &host   = "localhost",
-    int                 port    = 4142 );
+    void        *hSglx,
+    const char  *host   = "localhost",
+    int         port    = 4142 );
 
-// Close network connection and release resources.
+// Close connection and release network resources.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_close( t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_close( void *hSglx );
 
 // Hide console/log window to reduce screen clutter.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_consoleHide( t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_consoleHide( void *hSglx );
 
 // Show console/log window.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_consoleShow( t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_consoleShow( void *hSglx );
 
 // Retrieve a listing of files in idir data directory.
 // Get main data directory by setting idir=0 or omitting it.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_enumDataDir(
-    std::vector<std::string>    &vstr,
-    t_sglxconn                  &S,
-    int                         idir = 0 );
+    T_sglx_get_strs     &vs,
+    void                *hSglx,
+    int                 idir = 0 );
 
 // Get binary stream data as linear array.
 // Samp count = MIN(max_samps,available).
@@ -175,19 +302,11 @@ SGLX_EXPORT bool SGLX_CALL sglx_enumDataDir(
 //      -1 = all acquired channels, or,
 //      -2 = all saved channels.
 // Data are int16 type.
-// downsample_ratio is an integer (default = 1).
+// downsample is an integer (default = 1).
 //
-// Return headCt = index of first sample in matrix, or zero if error.
+// Return headCt = index of first sample, or zero if error.
 //
-SGLX_EXPORT t_ull SGLX_CALL sglx_fetch(
-    std::vector<short>      &data,
-    t_sglxconn              &S,
-    int                     js,
-    int                     ip,
-    t_ull                   start_samp,
-    int                     max_samps,
-    const std::vector<int>  &channel_subset     = {},
-    int                     downsample_ratio    = 1 );
+SGLX_EXPORT t_ull SGLX_CALL sglx_fetch( T_sglx_fetch &io, void *hSglx, t_ull start_samp );
 
 // Get binary stream data as linear array.
 // Samp count = MIN(max_samps,available).
@@ -196,29 +315,22 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_fetch(
 //      -1 = all acquired channels, or,
 //      -2 = all saved channels.
 // Data are int16 type.
-// downsample_ratio is an integer (default = 1).
+// downsample is an integer (default = 1).
 //
-// Return headCt = index of first sample in matrix, or zero if error.
+// Return headCt = index of first sample, or zero if error.
 //
-SGLX_EXPORT t_ull SGLX_CALL sglx_fetchLatest(
-    std::vector<short>      &data,
-    t_sglxconn              &S,
-    int                     js,
-    int                     ip,
-    int                     max_samps,
-    const std::vector<int>  &channel_subset     = {},
-    int                     downsample_ratio    = 1 );
+SGLX_EXPORT t_ull SGLX_CALL sglx_fetchLatest( T_sglx_fetch &io, void *hSglx );
 
 // Get ith global data directory.
 // Get main data directory by setting idir=0 or omitting it.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getDataDir(
     std::string &dir,
-    t_sglxconn  &S,
+    void        *hSglx,
     int         idir = 0 );
 
 // Get geomMap for given logical imec probe.
-// Returned as a struct of key-value pairs.
+// Returned as (key,value) pairs.
 // Header fields:
 //     head_partNumber
 //     head_numShanks
@@ -233,48 +345,48 @@ SGLX_EXPORT bool SGLX_CALL sglx_getDataDir(
 //  Note: Fields are in ascending alphanumeric order!
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getGeomMap(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S,
-    int                                 ip );
+    T_sglx_get_strs     &kv,
+    void                *hSglx,
+    int                 ip );
 
 // Get gains for given probe and channel.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
-    double      &APgain,
-    double      &LFgain,
-    t_sglxconn  &S,
-    int         ip,
-    int         chan );
+    double  &APgain,
+    double  &LFgain,
+    void    *hSglx,
+    int     ip,
+    int     chan );
 
 // Get the most recently used run parameters.
-// These are a map of key-value pairs.
+// These are (key,value) pairs.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getParams(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S );
+    T_sglx_get_strs     &kv,
+    void                *hSglx );
 
 // Get imec parameters common to all enabled probes.
-// These are a map of key-value pairs.
+// These are (key,value) pairs.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecCommon(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S );
+    T_sglx_get_strs     &kv,
+    void                *hSglx );
 
 // Get imec parameters for given logical probe.
-// These are a map of key-value pairs.
+// These are (key,value) pairs.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecProbe(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S,
-    int                                 ip );
+    T_sglx_get_strs     &kv,
+    void                *hSglx,
+    int                 ip );
 
 // Get parameters for given logical OneBox.
-// These are a map of key-value pairs.
+// These are (key,value) pairs.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
-    std::map<std::string,std::string>   &mstrstr,
-    t_sglxconn                          &S,
-    int                                 ip );
+    T_sglx_get_strs     &kv,
+    void                *hSglx,
+    int                 ip );
 
 // Get string with format:
 // (probeID,nShanks,partNumber)()...
@@ -284,13 +396,13 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
 // - partNumber: string, e.g., NP1000.
 // - If no probes, return '()'.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_getProbeList( std::string &list, t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_getProbeList( std::string &list, void *hSglx );
 
 // Get run base name.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_getRunName( std::string &name, t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_getRunName( std::string &name, void *hSglx );
 
-// For the selected substream, return a vector of the
+// For the selected substream, return an array of the
 // number of channels of each type that stream is acquiring.
 //
 // js = 0: NI channels: {MN,MA,XA,DW}.
@@ -298,8 +410,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_getRunName( std::string &name, t_sglxconn &S );
 // js = 2: IM channels: {AP,LF,SY}.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamAcqChans(
-    std::vector<int>    &vi32,
-    t_sglxconn          &S,
+    T_sglx_get_ints     &vint,
+    void                *hSglx,
     int                 js,
     int                 ip );
 
@@ -307,53 +419,53 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamAcqChans(
 // or zero if unavailable.
 //
 SGLX_EXPORT t_ull SGLX_CALL sglx_getStreamFileStart(
-    t_sglxconn  &S,
-    int         js,
-    int         ip );
+    void    *hSglx,
+    int     js,
+    int     ip );
 
 // Return multiplier converting 16-bit binary channel to volts.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamI16ToVolts(
-    double      &mult,
-    t_sglxconn  &S,
-    int         js,
-    int         ip,
-    int         chan );
+    double  &mult,
+    void    *hSglx,
+    int     js,
+    int     ip,
+    int     chan );
 
 // Return largest positive integer value for selected stream.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamMaxInt(
-    int         &maxInt,
-    t_sglxconn  &S,
-    int         js,
-    int         ip );
+    int     &maxInt,
+    void    *hSglx,
+    int     js,
+    int     ip );
 
 // Get number (np) of js-type substreams.
 // For the given js, ip has range [0..np-1].
 //
-SGLX_EXPORT bool SGLX_CALL sglx_getStreamNP( int &np, t_sglxconn &S, int js );
+SGLX_EXPORT bool SGLX_CALL sglx_getStreamNP( int &np, void *hSglx, int js );
 
 // Return number of samples since current run started,
 // or zero if not running or error.
 //
 SGLX_EXPORT t_ull SGLX_CALL sglx_getStreamSampleCount(
-    t_sglxconn  &S,
-    int         js,
-    int         ip );
+    void    *hSglx,
+    int     js,
+    int     ip );
 
 // Return sample rate of selected stream in Hz, or zero if error.
 //
 SGLX_EXPORT double SGLX_CALL sglx_getStreamSampleRate(
-    t_sglxconn  &S,
-    int         js,
-    int         ip );
+    void    *hSglx,
+    int     js,
+    int     ip );
 
-// Get a vector containing the indices of
+// Get an array containing the indices of
 // the acquired channels that are being saved.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamSaveChans(
-    std::vector<int>    &vi32,
-    t_sglxconn          &S,
+    T_sglx_get_ints     &vint,
+    void                *hSglx,
     int                 js,
     int                 ip );
 
@@ -362,7 +474,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamSaveChans(
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamShankMap(
     t_sglxshankmap  &shankmap,
-    t_sglxconn      &S,
+    void            *hSglx,
     int             js,
     int             ip );
 
@@ -373,64 +485,64 @@ SGLX_EXPORT bool SGLX_CALL sglx_getStreamShankMap(
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamSN(
     int             &slot_or_type,
     std::string     &SN,
-    t_sglxconn      &S,
+    void            *hSglx,
     int             js,
     int             ip );
 
 // Get voltage range of selected data stream.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getStreamVoltageRange(
-    double      &vMin,
-    double      &vMax,
-    t_sglxconn  &S,
-    int         js,
-    int         ip );
+    double  &vMin,
+    double  &vMax,
+    void    *hSglx,
+    int     js,
+    int     ip );
 
 // Return number of seconds since SpikeGLX application was launched,
 // or zero if error.
 //
-SGLX_EXPORT double SGLX_CALL sglx_getTime( t_sglxconn &S );
+SGLX_EXPORT double SGLX_CALL sglx_getTime( void *hSglx );
 
 // Get SpikeGLX version string.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_getVersion( std::string &vers, t_sglxconn &S );
+SGLX_EXPORT const char* SGLX_CALL sglx_getVersion( void *hSglx );
 
 // Test if console window is hidden.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_isConsoleHidden( bool &hidden, t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_isConsoleHidden( bool &hidden, void *hSglx );
 
 // Test if SpikeGLX has completed its startup initialization
 // and is ready to run.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_isInitialized( bool &ready, t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_isInitialized( bool &ready, void *hSglx );
 
 // Test if SpikeGLX is currently acquiring data.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_isRunning( bool &running, t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_isRunning( bool &running, void *hSglx );
 
 // Test if SpikeGLX is currently running AND saving data.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_isSaving( bool &saving, t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_isSaving( bool &saving, void *hSglx );
 
 // Test if graphs currently sorted in user order.
 // This query is sent only to the main Graphs window.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_isUserOrder(
-    bool        &userOrder,
-    t_sglxconn  &S,
-    int         js,
-    int         ip );
+    bool    &userOrder,
+    void    *hSglx,
+    int     js,
+    int     ip );
 
 // Return sample in dst stream corresponding to given sample in src stream,
 // or zero if error.
 //
 SGLX_EXPORT t_ull SGLX_CALL sglx_mapSample(
-    t_sglxconn  &S,
-    int         dstjs,
-    int         dstip,
-    t_ull       srcSample,
-    int         srcjs,
-    int         srcip );
+    void    *hSglx,
+    int     dstjs,
+    int     dstip,
+    t_ull   srcSample,
+    int     srcjs,
+    int     srcip );
 
 // Direct emission to specified site (-1=dark).
 // ip:    imec probe index.
@@ -438,18 +550,18 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_mapSample(
 // site:  [0..13], or, -1=dark.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_opto_emit(
-    t_sglxconn  &S,
-    int         ip,
-    int         color,
-    int         site );
+    void    *hSglx,
+    int     ip,
+    int     color,
+    int     site );
 
-// Get vector of 14 (double) site power attenuation factors.
+// Get array of 14 (double) site power attenuation factors.
 // ip:    imec probe index.
 // color: {0=blue, 1=red}.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_opto_getAttenuations(
-    std::vector<double> &vdbl,
-    t_sglxconn          &S,
+    T_sglx_get_dbls     &vdbl,
+    void                *hSglx,
     int                 ip,
     int                 color );
 
@@ -463,7 +575,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_opto_getAttenuations(
 //
 SGLX_EXPORT bool SGLX_CALL sglx_par2(
     void                (SGLX_CALL *callback)(const char *status),
-    t_sglxconn          &S,
+    void                *hSglx,
     char                op,
     const std::string   &file );
 
@@ -477,28 +589,27 @@ SGLX_EXPORT bool SGLX_CALL sglx_par2(
 //    - rgnname:  region name text.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setAnatomy_Pinpoint(
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &shankdat );
 
 // Set audio output on/off. Note that this command has
 // no effect if not currently running.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_setAudioEnable( t_sglxconn &S, bool enable );
+SGLX_EXPORT bool SGLX_CALL sglx_setAudioEnable( void *hSglx, bool enable );
 
-// Set subgroup of parameters for audio-out operation. Parameters
-// are a map of key-value pairs. This call stops current output.
-// Call sglx_setAudioEnable() to restart it.
+// Set subgroup of parameters for audio-out operation. This call
+// stops current output. Call sglx_setAudioEnable() to restart it.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setAudioParams(
-    t_sglxconn                              &S,
-    const std::string                       &group,
-    const std::map<std::string,std::string> &mstrstr );
+    void                    *hSglx,
+    const std::string       &group,
+    T_sglx_set_keyvals      &kv );
 
 // Set ith global data directory.
 // Set required parameter idir to zero for main data directory.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setDataDir(
-    t_sglxconn          &S,
+    void                *hSglx,
     int                 idir,
     const std::string   &dir );
 
@@ -506,21 +617,20 @@ SGLX_EXPORT bool SGLX_CALL sglx_setDataDir(
 // "Dev6/port0/line2,Dev6/port0/line5".
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setDigitalOut(
-    t_sglxconn          &S,
+    void                *hSglx,
     bool                hi_lo,
     const std::string   &channels );
 
 // If a run is in progress, set metadata to be added to the
-// next output file-set. Metadata must be in the form of a
-// map of key-value pairs.
+// next output file-set.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setMetadata(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr );
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv );
 
 // Set multi-drive run-splitting on/off.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_setMultiDriveEnable( t_sglxconn &S, bool enable );
+SGLX_EXPORT bool SGLX_CALL sglx_setMultiDriveEnable( void *hSglx, bool enable );
 
 // For only the next trigger (file writing event) this overrides
 // all auto-naming, giving you complete control of where to save
@@ -553,53 +663,49 @@ SGLX_EXPORT bool SGLX_CALL sglx_setMultiDriveEnable( t_sglxconn &S, bool enable 
 //    + etc.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setNextFileName(
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &name );
 
 // The inverse of sglx_getParams, this sets run parameters.
-// Run parameters are a map of key-value pairs. The call
-// will error if a run is currently in progress.
+// The call will error if a run is currently in progress.
 //
 // Note: You can set any subset of [DAQSettings].
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setParams(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr );
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv );
 
 // The inverse of sglx_getParamsImecCommon, this sets parameters
-// common to all enabled probes. Parameters are a map of
-// key-value pairs. The call will error if a run is currently
-// in progress.
+// common to all enabled probes. The call will error if a run is
+// currently in progress.
 //
 // Note: You can set any subset of [DAQ_Imec_All].
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecCommon(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr );
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv );
 
 // The inverse of sglx_getParamsImecProbe, this sets parameters
-// for a given logical probe. Parameters are a map of
-// key-value pairs. The call will error if file writing
+// for a given logical probe. The call will error if file writing
 // is currently in progress.
 //
 // Note: You can set any subset of fields under [SerialNumberToProbe]/SNjjj.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr,
-    int                                     ip );
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv,
+    int                     ip );
 
 // The inverse of sglx_getParamsOneBox, this sets parameters
-// for a given logical OneBox. Parameters are a map of
-// key-value pairs. The call will error if a run is currently
-// in progress.
+// for a given logical OneBox. The call will error if a run is
+// currently in progress.
 //
 // Note: You can set any subset of fields under [SerialNumberToOneBox]/SNjjj.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsOneBox(
-    t_sglxconn                              &S,
-    const std::map<std::string,std::string> &mstrstr,
-    int                                     ip );
+    void                    *hSglx,
+    T_sglx_set_keyvals      &kv,
+    int                     ip );
 
 // Set gate (file writing) on/off during run.
 //
@@ -607,43 +713,43 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsOneBox(
 // the g-index and resets the t-index to zero. Auto-naming is
 // on unless sglx_setNextFileName has been used to override it.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_setRecordingEnable( t_sglxconn &S, bool enable );
+SGLX_EXPORT bool SGLX_CALL sglx_setRecordingEnable( void *hSglx, bool enable );
 
 // Set the run name for the next time files are created
 // (either by trigger, sglx_setRecordingEnable() or by sglx_startRun()).
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setRunName(
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &name );
 
 // During a run, set frequency and duration of Windows
 // beep signaling file closure. hertz=0 disables the beep.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setTriggerOffBeep(
-    t_sglxconn          &S,
-    int                 hertz,
-    int                 millisec );
+    void    *hSglx,
+    int     hertz,
+    int     millisec );
 
 // During a run set frequency and duration of Windows
 // beep signaling file creation. hertz=0 disables the beep.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setTriggerOnBeep(
-    t_sglxconn          &S,
-    int                 hertz,
-    int                 millisec );
+    void    *hSglx,
+    int     hertz,
+    int     millisec );
 
 // Start data acquisition run. Last-used parameters remain
 // in effect. An error is flagged if already running. The
 // name parameter is optional; set NULL or "" to use existing.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_startRun(
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &name = "" );
 
 // Unconditionally stop current run, close data files
 // and return to idle state.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_stopRun( t_sglxconn &S );
+SGLX_EXPORT bool SGLX_CALL sglx_stopRun( void *hSglx );
 
 // Using standard auto-naming, set both the gate (g) and
 // trigger (t) levels that control file writing.
@@ -658,7 +764,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_stopRun( t_sglxconn &S );
 // switch. sglx_triggerGT is blocked until you click the button or call
 // sglx_setRecordingEnable.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_triggerGT( t_sglxconn &S, int g, int t );
+SGLX_EXPORT bool SGLX_CALL sglx_triggerGT( void *hSglx, int g, int t );
 
 // Verifies the SHA1 sum of the file specified by filename.
 // If filename is relative, it is appended to the run dir.
@@ -669,7 +775,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_triggerGT( t_sglxconn &S, int g, int t );
 //
 SGLX_EXPORT bool SGLX_CALL sglx_verifySha1(
     void                (SGLX_CALL *callback)(const char *status),
-    t_sglxconn          &S,
+    void                *hSglx,
     const std::string   &filename );
 
 #ifdef __cplusplus

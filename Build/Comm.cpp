@@ -18,24 +18,24 @@ int             Comm::m_nextHandle = 0;
 /* Public --------------------------------------------------------- */
 /* ---------------------------------------------------------------- */
 
-bool Comm::checkConn( t_sglxconn &S ) noexcept(false)
+bool Comm::checkConn( t_sglxconn *S ) noexcept(false)
 {
-    if( S.in_checkconn )
+    if( S->in_checkconn )
         return true;
 
-    S.in_checkconn = true;
-    S.cpp_zer_str( S.err );
+    S->in_checkconn = true;
+    S->err.clear();
 
     bool    ok = true;
 
-    if( S.handle == -1 ) {
+    if( S->handle == -1 ) {
 
-        S.handle = create( S );
+        S->handle = create( S );
 
-        if( !tryConnection( S.handle ) )
+        if( !tryConnection( S->handle ) )
             return error( "checkConn: Unable to connect to server." );
 
-        ok = do1LineQuery( S.vers, S, "GETVERSION", false );
+        ok = do1LineQuery( S->vers, S, "GETVERSION", true );
     }
     else {
 
@@ -46,26 +46,26 @@ bool Comm::checkConn( t_sglxconn &S ) noexcept(false)
         }
         catch( const exception &e ) {
 
-            if( !tryConnection( S.handle ) ) {
-                S.in_checkconn = false;
+            if( !tryConnection( S->handle ) ) {
+                S->in_checkconn = false;
                 ok = error( "checkConn: Still unable to connect to server." );
             }
         }
     }
 
-    S.in_checkconn = false;
+    S->in_checkconn = false;
     return ok;
 }
 
 
-void Comm::close( t_sglxconn &S ) noexcept(false)
+void Comm::close( t_sglxconn *S ) noexcept(false)
 {
-    closeSocket( S.handle );
+    closeSocket( S->handle );
     destroy( S );
 }
 
 
-bool Comm::doCommand( t_sglxconn &S, const string &cmd ) noexcept(false)
+bool Comm::doCommand( t_sglxconn *S, const string &cmd ) noexcept(false)
 {
     if( !checkConn( S ) )
         return false;
@@ -76,51 +76,38 @@ bool Comm::doCommand( t_sglxconn &S, const string &cmd ) noexcept(false)
 }
 
 
-bool Comm::do1LineQuery( string &resp, t_sglxconn &S, const string &cmd, bool srvside ) noexcept(false)
+bool Comm::do1LineQuery( string &resp, t_sglxconn *S, const string &cmd, bool srvside ) noexcept(false)
 {
     if( srvside )
         resp.clear();
     else
-        S.cpp_zer_str( resp );
+        S->cpp_zer_str( resp );
 
     if( !checkConn( S ) )
         return false;
 
     sendString( S, cmd + "\n" );
 
-    vector<string>  vs;
-    read_vs( vs, S, true );
-
-    if( vs.size() ) {
-        if( srvside )
-            resp = vs[0];
-        else
-            S.cpp_ins_str( resp, vs[0].c_str() );
-    }
-
-    return true;
+    return read_resp( resp, S, srvside );
 }
 
 
-bool Comm::doNLineQuery( vector<string> &vs, t_sglxconn &S, const string &cmd, bool srvside ) noexcept(false)
+bool Comm::doNLineQuery( T_sglx_get_strs &cli_vs, t_sglxconn *S, const string &cmd ) noexcept(false)
 {
-    if( srvside )
-        vs.clear();
-    else
-        S.cpp_zer_vstr( vs );
+    cli_vs._dispatch( cli_vs, "" );
 
     if( !checkConn( S ) )
         return false;
 
     sendString( S, cmd + "\n" );
 
-    return read_vs( vs, S, srvside );
+    return read_client_vs( cli_vs, S );
 }
 
 
-bool Comm::sendString( t_sglxconn &S, const string &s ) noexcept(false)
+bool Comm::sendString( t_sglxconn *S, const string &s ) noexcept(false)
 {
-    NetClient   *nc = mapFind( S.handle );
+    NetClient   *nc = mapFind( S->handle );
 
     if( !nc )
         return error( "sendString: Invalid handle." );
@@ -136,9 +123,9 @@ bool Comm::sendString( t_sglxconn &S, const string &s ) noexcept(false)
 
 // Fetch next line, excluding ERROR lines.
 //
-bool Comm::read_1s_srvside( string &s, t_sglxconn &S ) noexcept(false)
+bool Comm::read_1s_srvside( string &s, t_sglxconn *S ) noexcept(false)
 {
-    NetClient   *nc = mapFind( S.handle );
+    NetClient   *nc = mapFind( S->handle );
 
     s.clear();
 
@@ -156,16 +143,11 @@ bool Comm::read_1s_srvside( string &s, t_sglxconn &S ) noexcept(false)
 }
 
 
-// Fetch one or more lines, excluding {OK, ERROR} lines.
+// Fetch one line, excluding {OK, ERROR} lines.
 //
-bool Comm::read_vs( vector<string> &vs, t_sglxconn &S, bool srvside ) noexcept(false)
+bool Comm::read_resp( string &resp, t_sglxconn *S, bool srvside ) noexcept(false)
 {
-    NetClient   *nc = mapFind( S.handle );
-
-    if( srvside )
-        vs.clear();
-    else
-        S.cpp_zer_vstr( vs );
+    NetClient   *nc = mapFind( S->handle );
 
     if( !nc )
         return error( "readNLines: Invalid handle." );
@@ -187,9 +169,9 @@ bool Comm::read_vs( vector<string> &vs, t_sglxconn &S, bool srvside ) noexcept(f
                 return error( s );
 
             if( srvside )
-                vs.push_back( s );
+                resp = s;
             else
-                S.cpp_ins_vstr( vs, s );
+                S->cpp_set_str( resp, s );
         }
     }
 
@@ -197,7 +179,40 @@ bool Comm::read_vs( vector<string> &vs, t_sglxconn &S, bool srvside ) noexcept(f
 }
 
 
-bool Comm::receiveOK( t_sglxconn &S, const string &cmd ) noexcept(false)
+// Fetch one or more lines, excluding {OK, ERROR} lines.
+//
+bool Comm::read_client_vs( T_sglx_get_strs &vs, t_sglxconn *S ) noexcept(false)
+{
+    NetClient   *nc = mapFind( S->handle );
+
+    if( !nc )
+        return error( "readNLines: Invalid handle." );
+
+    vector<char>    line;
+
+    for(;;) {
+
+        nc->rcvLine( line );
+
+        if( line.size() ) {
+
+            const char  *s = &line[0];
+
+            if( !strcmp( s, "OK" ) )
+                break;
+
+            if( !strncmp( s, "ERROR", 5 ) )
+                return error( s );
+
+            vs._dispatch( vs, s );
+        }
+    }
+
+    return true;
+}
+
+
+bool Comm::receiveOK( t_sglxconn *S, const string &cmd ) noexcept(false)
 {
     string  s;
     read_1s_srvside( s, S );
@@ -211,7 +226,7 @@ bool Comm::receiveOK( t_sglxconn &S, const string &cmd ) noexcept(false)
 }
 
 
-bool Comm::receiveREADY( t_sglxconn &S, const string &cmd ) noexcept(false)
+bool Comm::receiveREADY( t_sglxconn *S, const string &cmd ) noexcept(false)
 {
     string  s;
     read_1s_srvside( s, S );
@@ -225,9 +240,9 @@ bool Comm::receiveREADY( t_sglxconn &S, const string &cmd ) noexcept(false)
 }
 
 
-bool Comm::sendBinary( t_sglxconn &S, const void *data, int nBytes ) noexcept(false)
+bool Comm::sendBinary( t_sglxconn *S, const void *data, int nBytes ) noexcept(false)
 {
-    NetClient   *nc = mapFind( S.handle );
+    NetClient   *nc = mapFind( S->handle );
 
     if( !nc )
         return error( "sendBinary: Invalid handle." );
@@ -241,9 +256,9 @@ bool Comm::sendBinary( t_sglxconn &S, const void *data, int nBytes ) noexcept(fa
 }
 
 
-bool Comm::readBinary( void *data, int nBytes, t_sglxconn &S ) noexcept(false)
+bool Comm::readBinary( void *data, int nBytes, t_sglxconn *S ) noexcept(false)
 {
-    NetClient   *nc = mapFind( S.handle );
+    NetClient   *nc = mapFind( S->handle );
 
     if( !nc )
         return error( "readBinary: Invalid handle." );
@@ -300,17 +315,17 @@ void Comm::mapDestroy( int handle ) noexcept(false)
 }
 
 
-int Comm::create( t_sglxconn &S )
+int Comm::create( t_sglxconn *S )
 {
-    mapPut( new NetClient( S.cpp_get_str(S.host), S.port ) );
+    mapPut( new NetClient( S->host, S->port ) );
     return m_nextHandle;
 }
 
 
-void Comm::destroy( t_sglxconn &S ) noexcept(false)
+void Comm::destroy( t_sglxconn *S ) noexcept(false)
 {
-    mapDestroy( S.handle );
-    S.handle = -1;
+    mapDestroy( S->handle );
+    S->handle = -1;
 }
 
 

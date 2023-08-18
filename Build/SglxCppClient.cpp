@@ -10,59 +10,18 @@
 
 
 
+/* ---------------------------------------------------------------- */
+/* Client-side container callbacks -------------------------------- */
+/* ---------------------------------------------------------------- */
+
 void SGLX_CALL cppClient_zer_str( std::string &str )
 {
     str.clear();
 }
 
-void SGLX_CALL cppClient_zer_vi32( std::vector<int> &vi32 )
-{
-    vi32.clear();
-}
-
-void SGLX_CALL cppClient_zer_vdbl( std::vector<double> &vdbl )
-{
-    vdbl.clear();
-}
-
-void SGLX_CALL cppClient_zer_vstr( std::vector<std::string> &vstr )
-{
-    vstr.clear();
-}
-
-void SGLX_CALL cppClient_zer_mstrstr( std::map<std::string,std::string> &mstrstr )
-{
-    mstrstr.clear();
-}
-
-void SGLX_CALL cppClient_ins_str( std::string &str, const char *data )
+void SGLX_CALL cppClient_set_str( std::string &str, const char *data )
 {
     str = data;
-}
-
-void SGLX_CALL cppClient_ins_vi32( std::vector<int> &vi32, int data )
-{
-    vi32.push_back( data );
-}
-
-void SGLX_CALL cppClient_ins_vdbl( std::vector<double> &vdbl, double data )
-{
-    vdbl.push_back( data );
-}
-
-void SGLX_CALL cppClient_ins_vstr( std::vector<std::string> &vstr, const char *data )
-{
-    vstr.push_back( data );
-}
-
-void SGLX_CALL cppClient_ins_mstrstr( std::map<std::string,std::string> &mstrstr, const char *key, const char *val )
-{
-    mstrstr[key] = val;
-}
-
-void SGLX_CALL cppClient_siz_vi16( std::vector<short> &vi16, int n )
-{
-    vi16.resize( n );
 }
 
 const char* SGLX_CALL cppClient_get_str( const std::string &str )
@@ -70,75 +29,248 @@ const char* SGLX_CALL cppClient_get_str( const std::string &str )
     return str.c_str();
 }
 
-bool SGLX_CALL cppClient_itr_vi32( int &val, const std::vector<int> &vi32, void* &itr )
+/* ---------------------------------------------------------------- */
+/* T_sglx_get_strs ------------------------------------------------ */
+/* ---------------------------------------------------------------- */
+
+void cppClient_sglx_get_strs::set_str( const char *s )
 {
-    std::vector<int>::const_iterator    it;
-
-    if( itr )
-        it = *reinterpret_cast<std::vector<int>::const_iterator*>(&itr);
+    if( s[0] )
+        vstr.push_back( s );
     else
-        it = vi32.begin();
-
-    if( it != vi32.end() ) {
-        val = *it;
-        itr = *reinterpret_cast<void**>(&++it);
-        return true;
-    }
-    else {
-        itr = 0;
-        return false;
-    }
+        vstr.clear();
 }
 
-bool SGLX_CALL cppClient_itr_mstrstr(
-    const char*                             &key,
-    const char*                             &val,
-    const std::map<std::string,std::string> &mstrstr,
-    void*                                   &itr )
+void cClient_sglx_get_strs::set_str( const char *s )
 {
-    std::map<std::string,std::string>::const_iterator   it;
-
-    if( itr )
-        it = *reinterpret_cast<std::map<std::string,std::string>::const_iterator*>(&itr);
+    if( s[0] )
+        vstr.push_back( s );
     else
-        it = mstrstr.begin();
+        vstr.clear();
+}
 
-    if( it != mstrstr.end() ) {
+void SGLX_CALL T_sglx_get_strs::dispatch( T_sglx_get_strs &u, const char *s )
+{
+    u.set_str( s );
+}
+
+T_sglx_get_strs::T_sglx_get_strs()
+{
+    _dispatch = T_sglx_get_strs::dispatch;
+}
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_get_keyvals --------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+void cppClient_sglx_get_keyvals::set_str( const char *s )
+{
+    if( s[0] ) {
+        std::string kv(s);
+        int         eq = kv.find( '=' );
+        mstrstr[kv.substr( 0, eq )] = kv.substr( eq + 1 );
+    }
+    else
+        mstrstr.clear();
+}
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_get_ints ------------------------------------------------ */
+/* ---------------------------------------------------------------- */
+
+void cppClient_sglx_get_ints::set_val( int val, int flag )
+{
+    if( flag )
+        vint.push_back( val );
+    else
+        vint.clear();
+}
+
+void cClient_sglx_get_ints::set_val( int val, int flag )
+{
+    if( flag )
+        vint.push_back( val );
+    else
+        vint.clear();
+}
+
+void SGLX_CALL T_sglx_get_ints::dispatch( T_sglx_get_ints &u, int val, int flag )
+{
+    u.set_val( val, flag );
+}
+
+T_sglx_get_ints::T_sglx_get_ints()
+{
+    _dispatch = T_sglx_get_ints::dispatch;
+}
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_get_dbls ------------------------------------------------ */
+/* ---------------------------------------------------------------- */
+
+void cppClient_sglx_get_dbls::set_val( double val, int flag )
+{
+    if( flag )
+        vdbl.push_back( val );
+    else
+        vdbl.clear();
+}
+
+void cClient_sglx_get_dbls::set_val( double val, int flag )
+{
+    if( flag )
+        vdbl.push_back( val );
+    else
+        vdbl.clear();
+}
+
+void SGLX_CALL T_sglx_get_dbls::dispatch( T_sglx_get_dbls &u, double val, int flag )
+{
+    u.set_val( val, flag );
+}
+
+T_sglx_get_dbls::T_sglx_get_dbls()
+{
+    _dispatch = T_sglx_get_dbls::dispatch;
+}
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_set_ints ------------------------------------------------ */
+/* ---------------------------------------------------------------- */
+
+bool cppClient_sglx_set_ints::get_int( int &val, int j )
+{
+    if( j < vint.size() ) {
+        val = vint[j];
+        return true;
+    }
+    return false;
+}
+
+bool cClient_sglx_set_ints::get_int( int &val, int j )
+{
+    if( j < n ) {
+        val = vint[j];
+        return true;
+    }
+    return false;
+}
+
+bool SGLX_CALL T_sglx_set_ints::dispatch( T_sglx_set_ints &u, int &val, int j )
+{
+    return u.get_int( val, j );
+}
+
+T_sglx_set_ints::T_sglx_set_ints()
+{
+    _dispatch = T_sglx_set_ints::dispatch;
+}
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_set_keyvals --------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+bool cppClient_sglx_set_keyvals::get_pair( const char* &key, const char* &val )
+{
+    if( !key ) {
+        it  = mstrstr.begin();
+        end = mstrstr.end();
+    }
+    if( it != end ) {
         key = it->first.c_str();
         val = it->second.c_str();
-        itr = *reinterpret_cast<void**>(&++it);
+        ++it;
         return true;
     }
-    else {
-        itr = 0;
-        return false;
-    }
+    return false;
 }
 
+bool cClient_sglx_set_keyvals::get_pair( const char* &key, const char* &val )
+{
+    if( !key ) {
+        it  = mstrstr.begin();
+        end = mstrstr.end();
+    }
+    if( it != end ) {
+        key = it->first.c_str();
+        val = it->second.c_str();
+        ++it;
+        return true;
+    }
+    return false;
+}
 
-bool SGLX_CALL sglx_connect_std(
-    t_sglxconn          &S,
-    const std::string   &host,
-    int                 port )
+bool SGLX_CALL T_sglx_set_keyvals::dispatch( T_sglx_set_keyvals &u, const char* &key, const char* &val )
+{
+    return u.get_pair( key, val );
+}
+
+T_sglx_set_keyvals::T_sglx_set_keyvals()
+{
+    _dispatch = T_sglx_set_keyvals::dispatch;
+}
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_fetch --------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+short* cppClient_sglx_fetch::base_addr( int nshort )
+{
+    if( data.size() != nshort )
+        data.resize( nshort );
+
+    return &data[0];
+}
+
+short* cClient_sglx_fetch::base_addr( int nshort )
+{
+    if( data.size() != nshort )
+        data.resize( nshort );
+
+    return &data[0];
+}
+
+short* SGLX_CALL T_sglx_fetch::dispatch( T_sglx_fetch &u, int nshort )
+{
+    return u.base_addr( nshort );
+}
+
+T_sglx_fetch::T_sglx_fetch()
+{
+    _dispatch = T_sglx_fetch::dispatch;
+}
+
+/* ---------------------------------------------------------------- */
+/* t_sglxshankmap ------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+t_sglxshankmap::t_entry* cppClient_sglxshankmap::base_addr()
+{
+    e.resize( ne );
+    return (ne ? &e[0] : 0);
+}
+
+t_sglxshankmap::t_entry* SGLX_CALL t_sglxshankmap::dispatch( t_sglxshankmap &u )
+{
+    return u.base_addr();
+}
+
+t_sglxshankmap::t_sglxshankmap()
+{
+    _dispatch = t_sglxshankmap::dispatch;
+}
+
+/* ---------------------------------------------------------------- */
+/* Standard createHandle ------------------------------------------ */
+/* ---------------------------------------------------------------- */
+
+void* SGLX_CALL sglx_createHandle_std()
 {
     return
-    sglx_connect(
-        S,
+    sglx_createHandle(
         cppClient_zer_str,
-        cppClient_zer_vi32,
-        cppClient_zer_vdbl,
-        cppClient_zer_vstr,
-        cppClient_zer_mstrstr,
-        cppClient_ins_str,
-        cppClient_ins_vi32,
-        cppClient_ins_vdbl,
-        cppClient_ins_vstr,
-        cppClient_ins_mstrstr,
-        cppClient_siz_vi16,
-        cppClient_get_str,
-        cppClient_itr_vi32,
-        cppClient_itr_mstrstr,
-        host, port );
+        cppClient_set_str,
+        cppClient_get_str );
 }
 
 

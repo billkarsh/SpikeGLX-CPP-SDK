@@ -13,45 +13,136 @@ extern "C" {
 
 // clear client container
 void SGLX_CALL cppClient_zer_str( std::string &str );
-void SGLX_CALL cppClient_zer_vi32( std::vector<int> &vi32 );
-void SGLX_CALL cppClient_zer_vdbl( std::vector<double> &vdbl );
-void SGLX_CALL cppClient_zer_vstr( std::vector<std::string> &vstr );
-void SGLX_CALL cppClient_zer_mstrstr( std::map<std::string,std::string> &mstrstr );
 
 // insert into client container
-void SGLX_CALL cppClient_ins_str( std::string &str, const char *data );
-void SGLX_CALL cppClient_ins_vi32( std::vector<int> &vi32, int data );
-void SGLX_CALL cppClient_ins_vdbl( std::vector<double> &vdbl, double data );
-void SGLX_CALL cppClient_ins_vstr( std::vector<std::string> &vstr, const char *data );
-void SGLX_CALL cppClient_ins_mstrstr( std::map<std::string,std::string> &mstrstr, const char *key, const char *val );
-
-// resize client container
-void SGLX_CALL cppClient_siz_vi16( std::vector<short> &vi16, int n );
+void SGLX_CALL cppClient_set_str( std::string &str, const char *data );
 
 // get C-data from client container
 const char* SGLX_CALL cppClient_get_str( const std::string &str );
 
-// Iterate through vector:
-// Server sets opaque iterator to zero on first call;
-// itr then managed by this function thereafter.
-// Returns true if another val available.
-bool SGLX_CALL cppClient_itr_vi32( int &val, const std::vector<int> &vi32, void* &itr );
+/* ---------------------------------------------------------------- */
+/* T_sglx_get_strs ------------------------------------------------ */
+/* ---------------------------------------------------------------- */
 
-// Iterate through map:
-// Server sets opaque iterator to zero on first call;
-// itr then managed by this function thereafter.
-// Returns true if another (key,val) pair available.
-bool SGLX_CALL cppClient_itr_mstrstr(
-    const char*                             &key,
-    const char*                             &val,
-    const std::map<std::string,std::string> &mstrstr,
-    void*                                   &itr );
+struct cppClient_sglx_get_strs : public T_sglx_get_strs {
+    std::vector<std::string>    vstr;
+    virtual void set_str( const char *s );
+};
+
+struct cClient_sglx_get_strs : public T_sglx_get_strs {
+    std::vector<std::string>    &vstr;
+    cClient_sglx_get_strs( std::vector<std::string> &vstr )
+        : vstr(vstr)    {}
+    virtual void set_str( const char *s );
+};
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_get_keyvals --------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+struct cppClient_sglx_get_keyvals : public T_sglx_get_strs {
+    std::map<std::string,std::string>   mstrstr;
+    virtual void set_str( const char *s );
+};
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_get_ints ------------------------------------------------ */
+/* ---------------------------------------------------------------- */
+
+struct cppClient_sglx_get_ints : public T_sglx_get_ints {
+    std::vector<int>    vint;
+    virtual void set_val( int val, int flag );
+};
+
+struct cClient_sglx_get_ints : public T_sglx_get_ints {
+    std::vector<int>    &vint;
+    cClient_sglx_get_ints( std::vector<int> &vint )
+        : vint(vint)    {}
+    virtual void set_val( int val, int flag );
+};
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_get_dbls ------------------------------------------------ */
+/* ---------------------------------------------------------------- */
+
+struct cppClient_sglx_get_dbls : public T_sglx_get_dbls {
+    std::vector<double> vdbl;
+    virtual void set_val( double val, int flag );
+};
+
+struct cClient_sglx_get_dbls : public T_sglx_get_dbls {
+    std::vector<double> &vdbl;
+    cClient_sglx_get_dbls( std::vector<double> &vdbl )
+        : vdbl(vdbl)    {}
+    virtual void set_val( double val, int flag );
+};
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_set_ints ------------------------------------------------ */
+/* ---------------------------------------------------------------- */
+
+struct cppClient_sglx_set_ints : public T_sglx_set_ints {
+    std::vector<int>    vint;
+    virtual bool get_int( int &val, int j );
+};
+
+struct cClient_sglx_set_ints : public T_sglx_set_ints {
+    const int   *vint;
+    int         n;
+    cClient_sglx_set_ints( const int *vint, int n )
+        : vint(vint), n(n)  {}
+    virtual bool get_int( int &val, int j );
+};
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_set_keyvals --------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+struct cppClient_sglx_set_keyvals : public T_sglx_set_keyvals {
+    std::map<std::string,std::string>                   mstrstr;
+    std::map<std::string,std::string>::const_iterator   it, end;
+    virtual bool get_pair( const char* &key, const char* &val );
+};
+
+struct cClient_sglx_set_keyvals : public T_sglx_set_keyvals {
+    const std::map<std::string,std::string>             &mstrstr;
+    std::map<std::string,std::string>::const_iterator   it, end;
+    cClient_sglx_set_keyvals( const std::map<std::string,std::string> &mstrstr )
+        : mstrstr(mstrstr)  {}
+    virtual bool get_pair( const char* &key, const char* &val );
+};
+
+/* ---------------------------------------------------------------- */
+/* T_sglx_fetch --------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+struct cppClient_sglx_fetch : public T_sglx_fetch {
+    std::vector<short>  data;
+    std::vector<int>    chans;
+    virtual short* base_addr( int nshort );
+};
+
+struct cClient_sglx_fetch : public T_sglx_fetch {
+    std::vector<short>  &data;
+    cClient_sglx_fetch( std::vector<short> &data ) : data(data) {}
+    virtual short* base_addr( int nshort );
+};
+
+/* ---------------------------------------------------------------- */
+/* t_sglxshankmap ------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+struct cppClient_sglxshankmap : public t_sglxshankmap {
+    std::vector<t_entry>    e;
+    virtual t_entry* base_addr();
+};
+
+/* ---------------------------------------------------------------- */
+/* Standard createHandle ------------------------------------------ */
+/* ---------------------------------------------------------------- */
 
 // set standard callbacks
-bool SGLX_CALL sglx_connect_std(
-    t_sglxconn          &S,
-    const std::string   &host   = "localhost",
-    int                 port    = 4142 );
+void* SGLX_CALL sglx_createHandle_std();
 
 #ifdef __cplusplus
 }
