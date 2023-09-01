@@ -22,6 +22,13 @@ Explicitly supported in this package:
 > *Any other language that binds to C or C++ can be used if you provide
 the wrapper calls*.
 
+There's an included closed-loop latency test program; used to obtain these
+results on an i7-8850H, 2.6 GHz laptop:
+
+![CPP API Latency](cpp_latency.png)
+
+>*Note: Low latency mode is available with SpikeGLX 20230815 and later.*
+
 ### Who
 
 The SDK is developed by [Bill Karsh](https://www.janelia.org/people/bill-karsh)
