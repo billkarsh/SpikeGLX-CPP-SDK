@@ -3,8 +3,8 @@ SpikeGLX-CPP-SDK
 
 ### What
 
-The SDK lets remote applications communicate with SpikeGLX phase30 versions
-20220101 and later:
+The SDK lets remote **Windows** applications communicate with SpikeGLX
+phase30 versions 20220101 and later:
 
 * Set/get parameters.
 * Start/Stop runs.
