@@ -9,6 +9,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Edit the server address/port here
+static const char*  addr = "localhost";
+static int          port = 4142;
+
 
 
 
@@ -20,7 +24,7 @@ void justConnect()
 
 // Using default loopback address and port
 
-    if( c_sglx_connect( hSglx, "localhost", 4142 ) )
+    if( c_sglx_connect( hSglx, addr, port ) )
         printf( "version <%s>\n", c_sglx_getVersion( hSglx ) );
     else
         printf( "error [%s]\n", c_sglx_getError( hSglx ) );
@@ -38,7 +42,7 @@ void console_test()
 
     void    *hSglx = c_sglx_createHandle();
 
-    if( c_sglx_connect( hSglx, "localhost", 4142 ) ) {
+    if( c_sglx_connect( hSglx, addr, port ) ) {
 
         bool    hid;
 
@@ -71,7 +75,7 @@ void verify_test()
 
     void    *hSglx = c_sglx_createHandle();
 
-    if( c_sglx_connect( hSglx, "localhost", 4142 ) ) {
+    if( c_sglx_connect( hSglx, addr, port ) ) {
 
         char *file = "D:\\AAA\\TT_g0\\TT_g0_imec0\\TT_g0_t0.imec0.ap.bin";
 
@@ -96,7 +100,7 @@ void par2_test()
 
     void    *hSglx = c_sglx_createHandle();
 
-    if( c_sglx_connect( hSglx, "localhost", 4142 ) ) {
+    if( c_sglx_connect( hSglx, addr, port ) ) {
 
         char *file = "D:\\AAA\\TT_g0\\TT_g0_imec0\\TT_g0_t0.imec0.ap.bin";
 
@@ -121,7 +125,7 @@ void getParams_test()
 
     void    *hSglx = c_sglx_createHandle();
 
-    if( c_sglx_connect( hSglx, "localhost", 4142 ) ) {
+    if( c_sglx_connect( hSglx, addr, port ) ) {
 
         int nval, len;
 
@@ -151,7 +155,7 @@ void getShankMap_test()
 
     void    *hSglx = c_sglx_createHandle();
 
-    if( c_sglx_connect( hSglx, "localhost", 4142 ) ) {
+    if( c_sglx_connect( hSglx, addr, port ) ) {
 
         int nval, len;
 
@@ -182,7 +186,7 @@ void set_get_userNotes_test()
     void    *hSglx = c_sglx_createHandle();
     char    *newRunName = 0;
 
-    if( c_sglx_connect( hSglx, "localhost", 4142 ) ) {
+    if( c_sglx_connect( hSglx, addr, port ) ) {
 
         // Make sure we also set a new run name.
         const char *run;
@@ -240,7 +244,7 @@ void plot_NI_1sec_test()
 
     void    *hSglx = c_sglx_createHandle();
 
-    if( c_sglx_connect( hSglx, "localhost", 4142 ) ) {
+    if( c_sglx_connect( hSglx, addr, port ) ) {
 
         double      srate;
         t_ull       headCt;
@@ -311,7 +315,7 @@ void latency_test()
     void    *hSglx = c_sglx_createHandle();
     int     *channels = 0;
 
-    if( c_sglx_connect( hSglx, "localhost", 4142 ) ) {
+    if( c_sglx_connect( hSglx, addr, port ) ) {
 
         double      mv2i16  = 1.0/(1200.0/250/1024);
         t_ull       fromCt;

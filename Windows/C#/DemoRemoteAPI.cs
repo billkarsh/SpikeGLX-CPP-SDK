@@ -9,6 +9,10 @@ namespace DemoRemoteAPI_namespace {
 
     public class Tryit {
 
+        // Edit the server address/port here 
+        static string addr = "localhost";
+        static int port = 4142;
+
         public static void justConnect()
         {
             Console.WriteLine("\nCalling connect...\n\n");
@@ -17,7 +21,7 @@ namespace DemoRemoteAPI_namespace {
 
             // Using default loopback address and port
 
-            if (1 == C_Sglx.c_sglx_connect(hSglx, "localhost", 4142))
+            if (1 == C_Sglx.c_sglx_connect(hSglx, addr, port))
                 Console.WriteLine("version <{0}>\n", C_Sglx.cs_sglx_getVersion(hSglx));
             else
                 Console.WriteLine("error [{0}]\n", C_Sglx.cs_sglx_getError(hSglx));
@@ -34,7 +38,7 @@ namespace DemoRemoteAPI_namespace {
             Console.WriteLine("\nConsole test...\n\n");
 
             IntPtr hSglx = C_Sglx.c_sglx_createHandle();
-            int ok = C_Sglx.c_sglx_connect(hSglx, "localhost", 4142);
+            int ok = C_Sglx.c_sglx_connect(hSglx, addr, port);
 
             if (ok == 1)
             {
@@ -60,7 +64,7 @@ namespace DemoRemoteAPI_namespace {
             Console.WriteLine("\nVerify test...\n\n");
 
             IntPtr hSglx = C_Sglx.c_sglx_createHandle();
-            int ok = C_Sglx.c_sglx_connect(hSglx, "localhost", 4142);
+            int ok = C_Sglx.c_sglx_connect(hSglx, addr, port);
 
             if (ok == 1)
             {
@@ -83,7 +87,7 @@ namespace DemoRemoteAPI_namespace {
             Console.WriteLine("\nPar2 test...\n\n");
 
             IntPtr hSglx = C_Sglx.c_sglx_createHandle();
-            int ok = C_Sglx.c_sglx_connect(hSglx, "localhost", 4142);
+            int ok = C_Sglx.c_sglx_connect(hSglx, addr, port);
 
             if (ok == 1)
             {
@@ -106,7 +110,7 @@ namespace DemoRemoteAPI_namespace {
             Console.WriteLine("\nGet params...\n\n");
 
             IntPtr hSglx = C_Sglx.c_sglx_createHandle();
-            int ok = C_Sglx.c_sglx_connect(hSglx, "localhost", 4142);
+            int ok = C_Sglx.c_sglx_connect(hSglx, addr, port);
 
             if (ok == 1)
             {
@@ -135,7 +139,7 @@ namespace DemoRemoteAPI_namespace {
             Console.WriteLine("\nGet shank map...\n\n");
 
             IntPtr hSglx = C_Sglx.c_sglx_createHandle();
-            int ok = C_Sglx.c_sglx_connect(hSglx, "localhost", 4142);
+            int ok = C_Sglx.c_sglx_connect(hSglx, addr, port);
 
             if (ok == 1)
             {
@@ -164,7 +168,7 @@ namespace DemoRemoteAPI_namespace {
             Console.WriteLine("\nSet, get notes...\n\n");
 
             IntPtr hSglx = C_Sglx.c_sglx_createHandle();
-            int ok = C_Sglx.c_sglx_connect(hSglx, "localhost", 4142);
+            int ok = C_Sglx.c_sglx_connect(hSglx, addr, port);
 
             if (ok == 1)
             {
@@ -217,7 +221,7 @@ error:
             Console.WriteLine("\nPlot NI AI0...\n\n");
 
             IntPtr hSglx = C_Sglx.c_sglx_createHandle();
-            int ok = C_Sglx.c_sglx_connect(hSglx, "localhost", 4142);
+            int ok = C_Sglx.c_sglx_connect(hSglx, addr, port);
 
             if (ok == 1)
             {
@@ -292,7 +296,7 @@ error:
             Console.WriteLine("\nLatency test...\n\n");
 
             IntPtr hSglx = C_Sglx.c_sglx_createHandle();
-            int ok = C_Sglx.c_sglx_connect(hSglx, "localhost", 4142);
+            int ok = C_Sglx.c_sglx_connect(hSglx, addr, port);
 
             if (ok == 1)
             {

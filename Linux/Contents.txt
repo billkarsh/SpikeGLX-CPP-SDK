@@ -1,0 +1,65 @@
+
+========
+Contents
+========
+
+API folder
+==========
+API contains script 'make-install.sh' to build components.
+
+Always needed for any exe:
+    + libSglxApi.so         // place on library link/load path
+
+Some of these needed depending upon language:
+    + C_SglxApi.h           // add to project
+    + SglxApi.h             // add to project
+    + SglxCppClient.cpp     // add to CPP project
+    + SglxCppClient.h       // add to CPP project
+
+Build folder
+============
+Note: Building is requird for Linux.
+Edit and run: Linux/API/make-install.sh
+
+C folder
+========
+Tools to help build an ANSI C client:
+
+    + README.txt
+    + make.sh
+    + DemoRemoteAPI.c
+    + DemoRemoteAPI.h
+    + main.c
+
+CPP folder
+==========
+Tools to help build C++ client:
+
+    + README.txt
+    + make.sh
+    + DemoRemoteAPI.cpp
+    + DemoRemoteAPI.h
+    + main.cpp
+
+Python folder
+=============
+Tools to help build Python client:
+
+    sglx_pkg:
+        + __init__.py
+        + sglx.py
+        + sglx_demo.py  # equivalent to DemoRemoteAPI
+
+IMPORTANT: Make sure libSglxApi.so is on your load path,
+or copy it to your sglx_pkg folder.
+
+Help docs
+=========
+
+- Contents.txt
+- GettingStarted.txt
+- Help.txt
+- LICENSE.txt
+- WhatsNew.txt
+
+

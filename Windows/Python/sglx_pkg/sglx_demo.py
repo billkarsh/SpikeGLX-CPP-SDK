@@ -3,13 +3,17 @@
 import sglx as sglx
 from ctypes import byref, POINTER, c_int, c_short, c_bool, c_char_p
 
+# Edit the server address/port here
+sglx_addr = "localhost"
+sglx_port = 4142
+
 
 def justConnect():
     print( "\nCalling connect...\n\n" )
     hSglx = sglx.c_sglx_createHandle()
 
     # Using default loopback address and port
-    if sglx.c_sglx_connect( hSglx, "localhost".encode(), 4142 ):
+    if sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port ):
         print( "version <{}>\n".format( sglx.c_sglx_getVersion( hSglx ) ) )
     else:
         print( "error [{}]\n".format( sglx.c_sglx_getError( hSglx ) ) )
@@ -23,7 +27,7 @@ def justConnect():
 def console_test():
     print( "\nConsole test...\n\n" )
     hSglx = sglx.c_sglx_createHandle()
-    ok    = sglx.c_sglx_connect( hSglx, "localhost".encode(), 4142 )
+    ok    = sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port )
 
     if ok:
         hid = c_bool()
@@ -43,7 +47,7 @@ def console_test():
 def verify_test():
     print( "\nVerify test...\n\n" )
     hSglx = sglx.c_sglx_createHandle()
-    ok    = sglx.c_sglx_connect( hSglx, "localhost".encode(), 4142 )
+    ok    = sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port )
 
     if ok:
         filename = "D:\\AAA\\TT_g0\\TT_g0_imec0\\TT_g0_t0.imec0.ap.bin"
@@ -61,7 +65,7 @@ def verify_test():
 def par2_test():
     print( "\nPar2 test...\n\n" )
     hSglx = sglx.c_sglx_createHandle()
-    ok    = sglx.c_sglx_connect( hSglx, "localhost".encode(), 4142 )
+    ok    = sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port )
 
     if ok:
         filename = "D:\\AAA\\TT_g0\\TT_g0_imec0\\TT_g0_t0.imec0.ap.bin"
@@ -79,7 +83,7 @@ def par2_test():
 def getParams_test():
     print( "\nGet params...\n\n" )
     hSglx = sglx.c_sglx_createHandle()
-    ok    = sglx.c_sglx_connect( hSglx, "localhost".encode(), 4142 )
+    ok    = sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port )
 
     if ok:
         nval = c_int()
@@ -105,7 +109,7 @@ def getParams_test():
 def getShankMap_test():
     print( "\nGet shank map...\n\n" )
     hSglx = sglx.c_sglx_createHandle()
-    ok    = sglx.c_sglx_connect( hSglx, "localhost".encode(), 4142 )
+    ok    = sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port )
 
     if ok:
         nval = c_int()
@@ -128,7 +132,7 @@ def set_get_userNotes_test():
     print( "\nSet, get notes...\n\n" )
 
     hSglx = sglx.c_sglx_createHandle()
-    ok = sglx.c_sglx_connect( hSglx, "localhost".encode(), 4142 )
+    ok = sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port )
 
     if ok:
         # Make sure we also set a new run name.
@@ -168,7 +172,7 @@ def plot_NI_1sec_test():
     print( "\nPlot NI AI0...\n\n" )
 
     hSglx = sglx.c_sglx_createHandle()
-    ok    = sglx.c_sglx_connect( hSglx, "localhost".encode(), 4142 )
+    ok    = sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port )
 
     if ok:
         # NI stream is (js,ip) = (0,0)
@@ -224,7 +228,7 @@ def latency_test():
     print( "\nLatency test...\n\n" )
 
     hSglx = sglx.c_sglx_createHandle()
-    ok    = sglx.c_sglx_connect( hSglx, "localhost".encode(), 4142 )
+    ok    = sglx.c_sglx_connect( hSglx, sglx_addr.encode(), sglx_port )
 
     if ok:
         js = 2

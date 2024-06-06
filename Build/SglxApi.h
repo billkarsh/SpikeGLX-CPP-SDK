@@ -9,13 +9,23 @@
 #include <string>
 #include <vector>
 
+#if defined(WIN32) || defined(_WIN32) || defined(_WIN64) || defined(__NT__)
+// Windows
 #if defined(SGLXAPI_LIBRARY)
 #  define SGLX_EXPORT __declspec(dllexport)
 #else
 #  define SGLX_EXPORT __declspec(dllimport)
 #endif
-
 #define SGLX_CALL   __stdcall
+#else
+// Not Windows
+#if defined(SGLXAPI_LIBRARY)
+#  define SGLX_EXPORT __attribute__((visibility("default")))
+#else
+#  define SGLX_EXPORT
+#endif
+#define SGLX_CALL
+#endif
 
 #ifdef __cplusplus
 extern "C" {

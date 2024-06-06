@@ -5,7 +5,12 @@
 //#include "stdafx.h" // enable if using Visual Studio precompiled headers
 
 #include "SglxCppClient.h"
+#include <stdio.h>
 using namespace std;
+
+// Edit the server address/port here
+static const char*  addr = "localhost";
+static int          port = 4142;
 
 
 
@@ -18,7 +23,7 @@ void justConnect()
 
 // Using default loopback address and port
 
-    if( sglx_connect( hSglx ) )
+    if( sglx_connect( hSglx, addr, port ) )
         printf( "version <%s>\n", sglx_getVersion( hSglx ) );
     else
         printf( "error [%s]\n", sglx_getError( hSglx ) );
@@ -36,7 +41,7 @@ void console_test()
 
     void    *hSglx = sglx_createHandle_std();
 
-    if( sglx_connect( hSglx ) ) {
+    if( sglx_connect( hSglx, addr, port ) ) {
 
         bool    hid;
 
@@ -63,7 +68,7 @@ void getParams_test()
 
     void    *hSglx = sglx_createHandle_std();
 
-    if( sglx_connect( hSglx ) ) {
+    if( sglx_connect( hSglx, addr, port ) ) {
 
         cppClient_sglx_get_keyvals  kv;
 
@@ -93,7 +98,7 @@ void getShankMap_test()
 
     void    *hSglx = sglx_createHandle_std();
 
-    if( sglx_connect( hSglx ) ) {
+    if( sglx_connect( hSglx, addr, port ) ) {
 
         cppClient_sglxshankmap  map;
 
@@ -127,7 +132,7 @@ void set_get_userNotes_test()
 
     void    *hSglx = sglx_createHandle_std();
 
-    if( sglx_connect( hSglx ) ) {
+    if( sglx_connect( hSglx, addr, port ) ) {
 
         // Make sure we also set a new run name.
         string  run;
@@ -167,7 +172,7 @@ void plot_NI_1sec_test()
 
     void    *hSglx = sglx_createHandle_std();
 
-    if( sglx_connect( hSglx ) ) {
+    if( sglx_connect( hSglx, addr, port ) ) {
 
         cppClient_sglx_fetch    io;
         double                  srate;
@@ -239,7 +244,7 @@ void latency_test()
 
     void    *hSglx = sglx_createHandle_std();
 
-    if( sglx_connect( hSglx ) ) {
+    if( sglx_connect( hSglx, addr, port ) ) {
 
         cppClient_sglx_fetch    io;
         double                  mv2i16  = 1.0/(1200.0/250/1024);

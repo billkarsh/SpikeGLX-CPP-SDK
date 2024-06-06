@@ -3,7 +3,7 @@ SpikeGLX-CPP-SDK
 
 ### What
 
-The SDK lets remote **Windows** applications communicate with SpikeGLX
+The SDK lets remote Windows and Linux applications communicate with SpikeGLX
 phase30 versions 20220101 and later:
 
 * Set/get parameters.
@@ -16,7 +16,7 @@ Explicitly supported in this package:
 
 * C++
 * ANSI C
-* C#
+* C# (Windows)
 * Python
 
 > *Any other language that binds to C or C++ can be used if you provide
@@ -39,6 +39,12 @@ HHMI/Janelia Research Campus.
 
 I build using Qt 5.12.0 (MinGW 64-bit). Compiled components include
 supporting DLLs from that Qt version.
+
+### Building in Linux
+
+You edit/run SpikeGLX-CPP-SDK/Linux/API/make-install.sh to build libSglxApi.so,
+and set up the API headers. The Linux version builds with your local g++; there
+is no Qt dependence.
 
 ### Licensing
 

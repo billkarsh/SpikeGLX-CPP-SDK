@@ -8,7 +8,14 @@ QT -= gui
 
 TARGET = SglxApi
 TEMPLATE = lib
-DESTDIR = C:/Users/labadmin/Desktop/SGLBUILD/FIXU/SpikeGLX-CPP-SDK/API
+
+win32 {
+    DESTDIR = C:/Users/labadmin/Desktop/SGLBUILD/FIXU/SpikeGLX-CPP-SDK/Windows/API
+}
+
+unix {
+    DESTDIR = /home/billkarsh/Code/SpikeGLX-CPP-SDK/Linux/API
+}
 
 DEFINES += SGLXAPI_LIBRARY
 
@@ -52,14 +59,16 @@ defineReplace(copyToDir) {
 win32 {
     CONFIG  += skip_target_version_ext
     LIBS    += -lWs2_32
-    QMAKE_POST_LINK += $$copyToDir( C_SglxApi.h SglxApi.h SglxCppClient.h SglxCppClient.cpp, $${DESTDIR} )
 }
 
 unix {
     CONFIG += unversioned_libname
-    target.path = /usr/lib
-    INSTALLS += target
+#    target.path = /usr/lib
+#    INSTALLS += target
 }
+
+    QMAKE_POST_LINK += $$copyToDir( C_SglxApi.h SglxApi.h SglxCppClient.h SglxCppClient.cpp, $${DESTDIR} )
+
 
 QMAKE_TARGET_COMPANY = Bill Karsh
 QMAKE_TARGET_PRODUCT = SglxApi

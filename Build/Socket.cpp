@@ -67,7 +67,7 @@ static inline void DO_STARTUP()
                     " WSAStartup() failed." );
         }
 
-        ::atexit( DoCleanup );
+        atexit( DoCleanup );
         StartupCalled = true;
     }
 }
@@ -80,19 +80,18 @@ static inline void DO_STARTUP()
 
 #else   // UNIX
 
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <errno.h>
-#include <sys/select.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
+
+static std::string pfxerr( const char *prefix, const char *serr );
 
 #define DO_STARTUP()                do { } while(0)
-#define CLOSE( x )                  ::close( x )
-#define IOCTL( x, y, z )            ::ioctl( x, y, z )
-#define LASTERROR_STR()             std::strerror( errno )
+#define CLOSE( x )                  close( x )
+#define IOCTL( x, y, z )            ioctl( x, y, z )
+#define LASTERROR_STR( prefix )     pfxerr( prefix, std::strerror( errno ) )
 #define LASTERROR_IS_CONNCLOSED()   \
     (errno == ECONNRESET || errno == ENOTCONN || errno == EPIPE)
 
@@ -136,11 +135,11 @@ bool Socket::tcpConnect( const std::string &host, uint16 port ) noexcept(false)
     switch( m_type ) {
 
         case UDP:
-            m_sock = ::socket( PF_INET, SOCK_DGRAM, IPPROTO_IP );
+            m_sock = socket( PF_INET, SOCK_DGRAM, IPPROTO_IP );
             break;
 
         default:
-            m_sock = ::socket( PF_INET, SOCK_STREAM, IPPROTO_IP );
+            m_sock = socket( PF_INET, SOCK_STREAM, IPPROTO_IP );
             break;
     }
 
@@ -155,7 +154,7 @@ bool Socket::tcpConnect( const std::string &host, uint16 port ) noexcept(false)
         setTCPNDelay();
         resolveHostAddr();
 
-        if( ::connect(
+        if( connect(
                 m_sock,
                 reinterpret_cast<struct sockaddr*>(m_addr),
                 sizeof(*m_addr) ) ) {
@@ -177,7 +176,7 @@ void Socket::tcpDisconnect()
 {
     if( isValid() ) {
 
-        ::shutdown( m_sock, SHUT_RDWR );
+        shutdown( m_sock, SHUT_RDWR );
         CLOSE( m_sock );
     }
 
@@ -244,7 +243,7 @@ uint Socket::sendData( const void *src, uint srcBytes ) noexcept(false)
         // Datagram/UDP
         resolveHostAddr();
 
-        count = ::sendto(
+        count = sendto(
                     m_sock,
                     static_cast<const char*>(src),
                     srcBytes,
@@ -255,7 +254,7 @@ uint Socket::sendData( const void *src, uint srcBytes ) noexcept(false)
     else {
 
         // Stream/TCP
-        count = ::send(
+        count = send(
                     m_sock,
                     static_cast<const char*>(src),
                     srcBytes,
@@ -293,7 +292,7 @@ uint Socket::receiveData( void *dst, uint dstBytes ) noexcept(false)
 
         resolveHostAddr();
 
-        count = ::recvfrom(
+        count = recvfrom(
                     m_sock,
                     static_cast<char*>(dst),
                     dstBytes,
@@ -304,7 +303,7 @@ uint Socket::receiveData( void *dst, uint dstBytes ) noexcept(false)
     else {
 
         // Stream/TCP
-        count = ::recv(
+        count = recv(
                     m_sock,
                     static_cast<char*>(dst),
                     dstBytes,
@@ -413,11 +412,7 @@ void Socket::resolveHostAddr(
                 ")." );
     }
 
-    memcpy(
-        &addr.sin_addr.s_addr,
-        he->h_addr,
-        sizeof(addr.sin_addr.s_addr) );
-
+    memcpy( &addr.sin_addr.s_addr, he->h_addr, he->h_length );
     addr.sin_port   = htons( port );
     addr.sin_family = AF_INET;
 }
@@ -427,7 +422,7 @@ void Socket::setTCPNDelay() const
 {
 #ifdef WIN32
     BOOL    flag    = m_tcpNDelay;
-    int     ret     = ::setsockopt(
+    int     ret     = setsockopt(
                         m_sock,
                         IPPROTO_TCP,
                         TCP_NODELAY,
@@ -435,7 +430,7 @@ void Socket::setTCPNDelay() const
                         sizeof(flag) );
 #else
     long    flag    = m_tcpNDelay;
-    int     ret     = ::setsockopt(
+    int     ret     = setsockopt(
                         m_sock,
                         IPPROTO_TCP,
                         TCP_NODELAY,
@@ -452,7 +447,7 @@ void Socket::setReuseAddr() const
 {
 #ifdef WIN32
     BOOL    flag    = m_reuseAddr;
-    int     ret     = ::setsockopt(
+    int     ret     = setsockopt(
                         m_sock,
                         SOL_SOCKET ,
                         SO_REUSEADDR,
@@ -460,7 +455,7 @@ void Socket::setReuseAddr() const
                         sizeof(flag) );
 #else
     long    flag    = m_reuseAddr;
-    int     ret     = ::setsockopt(
+    int     ret     = setsockopt(
                         m_sock,
                         SOL_SOCKET,
                         SO_REUSEADDR,
@@ -596,6 +591,35 @@ std::string WSAGetLastErrorMessage(
     return outs.str();
 }
 
-#endif  // WINDOWS
+#else   // UNIX
+
+/* ---------------------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+/* UNIX ----------------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+#include <sstream>
+
+/* ---------------------------------------------------------------- */
+/* pfxerr --------------------------------------------------------- */
+/* ---------------------------------------------------------------- */
+
+// if( prefix ) Return prefix + ": " + serr.
+// else         Return serr.
+//
+std::string pfxerr( const char *prefix, const char *serr )
+{
+    std::ostringstream  outs;
+
+    if( prefix && *prefix )
+        outs << prefix << ": ";
+
+    outs << serr << std::ends;
+
+    return outs.str();
+}
+
+#endif
 
 

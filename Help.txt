@@ -2,7 +2,9 @@
 SYNOPSIS
 ========
 
-The SpikeGLX API (SglxApi.dll) accesses the SpikeGLX program via TCP/IP. On top of that, our message exchange protocol implements acknowledgement, validation and error reporting. SpikeGLX.exe and the API client can run on the same machine (via loopback socket address 127.0.0.1) or across a network.
+The SpikeGLX API accesses the SpikeGLX program via TCP/IP. On top of that, our message exchange protocol implements acknowledgement, validation and error reporting. SpikeGLX.exe and the API client can run on the same Windows machine or across a network.
+
+The lowest latency is achieved with SpikeGLX.exe and Windows client using loopback address 127.0.0.1. Note that WSL2 allows Linux to run under Windows, but that is within a virtual machine that has a separate loopback address, so don't choose loopback for that configuration.
 
 The API provides extensive control over a running SpikeGLX process: starting and stopping a run, setting parameters, fetching live data, calling the Par2 and SHA1 tools, and so on. Everything you need to integate SpikeGLX into your workflow.
 
