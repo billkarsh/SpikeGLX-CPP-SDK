@@ -2,6 +2,12 @@
 AS OF 20240129
 ==============
 
+- Allow remote fetch of filtered IM stream.
+
+==============
+AS OF 20231207
+==============
+
 - Move API and demos into /Windows
 - Add /Linux
 
