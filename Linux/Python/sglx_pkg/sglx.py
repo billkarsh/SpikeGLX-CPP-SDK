@@ -132,6 +132,7 @@ c_sglx_enumDataDir.argtypes = [POINTER(c_int), c_void_p, c_int]
 # Get binary stream data as linear array.
 # Samp count = MIN(max_samps,available).
 # Each sample contains N int16 channels, N depends upon channel_subset.
+# If filtered IM stream buffers are enabled, you may fetch from them with js=-2.
 # Fetching starts at index start_samp.
 # channel_subset is an array of specific channels to fetch, optionally,
 #      -1 = all acquired channels, or,
@@ -153,6 +154,7 @@ c_sglx_fetch.argtypes = [POINTER(POINTER(c_short)), POINTER(c_int), c_void_p, c_
 # Get binary stream data as linear array.
 # Samp count = MIN(max_samps,available).
 # Each sample contains N int16 channels, N depends upon channel_subset.
+# If filtered IM stream buffers are enabled, you may fetch from them with js=-2.
 # channel_subset is an array of specific channels to fetch, optionally,
 #      -1 = all acquired channels, or,
 #      -2 = all saved channels.
