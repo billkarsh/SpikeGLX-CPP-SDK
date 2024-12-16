@@ -1,4 +1,10 @@
 ==============
+AS OF 20241215
+==============
+
+- sglx_setDigitalOut replaced by sglx_set_NI_DO.
+
+==============
 AS OF 20240129
 ==============
 

@@ -9,7 +9,7 @@ namespace DemoRemoteAPI_namespace {
 
     public class Tryit {
 
-        // Edit the server address/port here 
+        // Edit the server address/port here
         static string addr = "localhost";
         static int port = 4142;
 
@@ -324,7 +324,7 @@ error:
                     goto error;
                 }
 
-                ok = C_Sglx.c_sglx_setDigitalOut(hSglx, level, line);
+                ok = C_Sglx.c_sglx_set_NI_DO(hSglx, line, level);
                 if (ok == 0)
                     goto error;
 
@@ -348,13 +348,13 @@ error:
 
                         if (diff > thresh && level == 0)
                         {
-                            level = 1;
-                            digOK = C_Sglx.c_sglx_setDigitalOut(hSglx, level, line);
+                            level = 0xFFFFFFFF;
+                            digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, level);
                         }
-                        else if (diff < -thresh && level == 1)
+                        else if (diff < -thresh && level == 0xFFFFFFFF)
                         {
                             level = 0;
-                            digOK = C_Sglx.c_sglx_setDigitalOut(hSglx, level, line);
+                            digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, level);
                         }
 
                         if (digOK == 0)

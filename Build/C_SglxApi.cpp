@@ -604,12 +604,12 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_setDataDir(
 }
 
 
-SGLX_EXPORT bool SGLX_CALL c_sglx_setDigitalOut(
-    void        *hSglx,
-    bool        hi_lo,
-    const char  *channels )
+SGLX_EXPORT bool SGLX_CALL c_sglx_set_NI_DO(
+    void            *hSglx,
+    const char      *lines,
+    unsigned int    bits )
 {
-    return sglx_setDigitalOut( hSglx, hi_lo, channels );
+    return sglx_set_NI_DO( hSglx, lines, bits );
 }
 
 

@@ -251,7 +251,7 @@ def latency_test():
         fromCt = sglx.c_sglx_getStreamSampleCount( hSglx, js, ip )
 
         if fromCt > 0:
-            ok = sglx.c_sglx_setDigitalOut( hSglx, level, line.encode() )
+            ok = sglx.sglx_set_NI_DO( hSglx, line.encode(), level )
 
             if ok:
                 while True:
@@ -267,11 +267,11 @@ def latency_test():
                         digOK = True
 
                         if diff > thresh and level == 0:
-                            level = 1
-                            digOK = sglx.c_sglx_setDigitalOut( hSglx, level, line.encode() )
-                        elif diff < -thresh and level == 1:
+                            level = 0xFFFFFFFF
+                            digOK = sglx.sglx_set_NI_DO( hSglx, line.encode(), level )
+                        elif diff < -thresh and level == 0xFFFFFFFF:
                             level = 0
-                            digOK = sglx.c_sglx_setDigitalOut( hSglx, level, line.encode() )
+                            digOK = sglx.sglx_set_NI_DO( hSglx, line.encode(), level )
 
                         if not digOK:
                             break

@@ -464,11 +464,17 @@ namespace C_Sglx_namespace
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_setDataDir(IntPtr hSglx, int idir, [MarshalAs(UnmanagedType.LPStr)] string dir);
 
-// Set digital output high/low. Channel strings have form:
-// "Dev6/port0/line2,Dev6/port0/line5".
+// Set one or more NI lines high/low.
+//   - lines is a string list of lines to set, e.g.:
+//       'Dev6/port0/line2,Dev6/port0/line5'
+//       'Dev6/port1/line0:3'
+//       'Dev6/port1:2'
+//   - bits is a uint32 value, each bit maps to a line:
+//       The lowest 8 bits map to port 0.
+//       The next higher 8 bits map to port 1, etc.
 //
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        public static extern int c_sglx_setDigitalOut(IntPtr hSglx, int hi_lo, [MarshalAs(UnmanagedType.LPStr)] string channels);
+        public static extern int c_sglx_set_NI_DO(IntPtr hSglx, [MarshalAs(UnmanagedType.LPStr)] string channels, int bits);
 
 // If a run is in progress, set metadata to be added to
 // the next output file-set. Metadata are key-value pairs.

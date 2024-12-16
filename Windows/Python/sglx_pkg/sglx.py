@@ -495,13 +495,19 @@ c_sglx_setDataDir = sglx.c_sglx_setDataDir
 c_sglx_setDataDir.restype = c_bool
 c_sglx_setDataDir.argtypes = [c_void_p, c_int, c_char_p]
 
-# Set digital output high/low. Channel strings have form:
-# "Dev6/port0/line2,Dev6/port0/line5".
-# ok = c_sglx_setDigitalOut( hSglx, hi_lo, channels )
+# Set one or more NI lines high/low.
+#   - lines is a string list of lines to set, e.g.:
+#       'Dev6/port0/line2,Dev6/port0/line5'
+#       'Dev6/port1/line0:3'
+#       'Dev6/port1:2'
+#   - bits is a uint32 value, each bit maps to a line:
+#       The lowest 8 bits map to port 0.
+#       The next higher 8 bits map to port 1, etc.
+# ok = c_sglx_set_NI_DO( hSglx, lines, bits )
 #
-c_sglx_setDigitalOut = sglx.c_sglx_setDigitalOut
-c_sglx_setDigitalOut.restype = c_bool
-c_sglx_setDigitalOut.argtypes = [c_void_p, c_bool, c_char_p]
+c_sglx_set_NI_DO = sglx.c_sglx_set_NI_DO
+c_sglx_set_NI_DO.restype = c_bool
+c_sglx_set_NI_DO.argtypes = [c_void_p, c_char_p, c_int]
 
 # If a run is in progress, set metadata to be added to
 # the next output file-set. Metadata are key-value pairs.

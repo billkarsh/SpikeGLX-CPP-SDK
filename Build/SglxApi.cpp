@@ -913,17 +913,17 @@ SGLX_EXPORT bool SGLX_CALL sglx_setDataDir(
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_setDigitalOut(
+SGLX_EXPORT bool SGLX_CALL sglx_set_NI_DO(
     void                *hSglx,
-    bool                hi_lo,
-    const std::string   &channels )
+    const std::string   &lines,
+    unsigned int        bits )
 {
     Comm    C;
-    char    cmd[32];
-    sprintf( cmd, "SETDIGOUT %d ", hi_lo );
+    char    sbits[32];
+    sprintf( sbits, " %d", bits );
 
     try {
-        return C.doCommand( HS, string(cmd) + HS->cpp_get_str(channels) );
+        return C.doCommand( HS, string("SETNIDO ") + HS->cpp_get_str(lines) + sbits );
     }
     CATCH()
 }

@@ -625,13 +625,19 @@ SGLX_EXPORT bool SGLX_CALL sglx_setDataDir(
     int                 idir,
     const std::string   &dir );
 
-// Set digital output high/low. Channel strings have form:
-// "Dev6/port0/line2,Dev6/port0/line5".
+// Set one or more NI lines high/low.
+//   - lines is a string list of lines to set, e.g.:
+//       'Dev6/port0/line2,Dev6/port0/line5'
+//       'Dev6/port1/line0:3'
+//       'Dev6/port1:2'
+//   - bits is a uint32 value, each bit maps to a line:
+//       The lowest 8 bits map to port 0.
+//       The next higher 8 bits map to port 1, etc.
 //
-SGLX_EXPORT bool SGLX_CALL sglx_setDigitalOut(
+SGLX_EXPORT bool SGLX_CALL sglx_set_NI_DO(
     void                *hSglx,
-    bool                hi_lo,
-    const std::string   &channels );
+    const std::string   &lines,
+    unsigned int        bits );
 
 // If a run is in progress, set metadata to be added to the
 // next output file-set.

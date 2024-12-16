@@ -269,7 +269,7 @@ void latency_test()
         if( !(fromCt = sglx_getStreamSampleCount( hSglx, io.js, io.ip )) )
             goto error;
 
-        if( !sglx_setDigitalOut( hSglx, level, line ) )
+        if( !sglx_set_NI_DO( hSglx, line, level ) )
             goto error;
 
         for( ;; ) {
@@ -287,12 +287,12 @@ void latency_test()
                 bool    digOK = true;
 
                 if( diff > thresh && level == 0 ) {
-                    level = 1;
-                    digOK = sglx_setDigitalOut( hSglx, level, line );
+                    level = 0xFFFFFFFF;
+                    digOK = sglx_set_NI_DO( hSglx, line, level );
                 }
-                else if( diff < -thresh && level == 1 ) {
+                else if( diff < -thresh && level == 0xFFFFFFFF ) {
                     level = 0;
-                    digOK = sglx_setDigitalOut( hSglx, level, line );
+                    digOK = sglx_set_NI_DO( hSglx, line, level );
                 }
 
                 if( !digOK )
