@@ -392,13 +392,18 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecProbe(
     void                *hSglx,
     int                 ip );
 
-// Get parameters for given logical OneBox.
+// Get parameters for selected OneBox.
 // These are (key,value) pairs.
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
     T_sglx_get_strs     &kv,
     void                *hSglx,
-    int                 ip );
+    int                 ip,
+    int                 slot );
 
 // Get string with format:
 // (probeID,nShanks,partNumber)()...
@@ -714,16 +719,21 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
     T_sglx_set_keyvals      &kv,
     int                     ip );
 
-// The inverse of sglx_getParamsOneBox, this sets parameters
-// for a given logical OneBox. The call will error if a run is
+// The inverse of sglx_getParamsOneBox, this sets params
+// for a selected OneBox. The call will error if a run is
 // currently in progress.
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
 //
 // Note: You can set any subset of fields under [SerialNumberToOneBox]/SNjjj.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsOneBox(
     void                    *hSglx,
     T_sglx_set_keyvals      &kv,
-    int                     ip );
+    int                     ip,
+    int                     slot );
 
 // Set gate (file writing) on/off during run.
 //

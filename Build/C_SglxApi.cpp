@@ -309,13 +309,14 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_getParamsImecProbe(
 SGLX_EXPORT bool SGLX_CALL c_sglx_getParamsOneBox(
     int     *nval,
     void    *hSglx,
-    int     ip )
+    int     ip,
+    int     slot )
 {
     *nval = 0;
 
     cClient_sglx_get_strs   kv( HS->xvstr );
 
-    if( sglx_getParamsOneBox( kv, hSglx, ip ) ) {
+    if( sglx_getParamsOneBox( kv, hSglx, ip, slot ) ) {
         *nval = HS->xvstr.size();
         return true;
     }
@@ -645,11 +646,11 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_setKVParamsImecProbe( void *hSglx, int ip )
 }
 
 
-SGLX_EXPORT bool SGLX_CALL c_sglx_setKVParamsOneBox( void *hSglx, int ip )
+SGLX_EXPORT bool SGLX_CALL c_sglx_setKVParamsOneBox( void *hSglx, int ip, int slot )
 {
     cClient_sglx_set_keyvals    kv( HS->xmstrstr );
 
-    return sglx_setParamsOneBox( hSglx, kv, ip );
+    return sglx_setParamsOneBox( hSglx, kv, ip, slot );
 }
 
 

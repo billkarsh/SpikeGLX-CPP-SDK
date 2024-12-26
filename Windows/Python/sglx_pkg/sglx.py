@@ -249,15 +249,19 @@ c_sglx_getParamsImecProbe = sglx.c_sglx_getParamsImecProbe
 c_sglx_getParamsImecProbe.restype = c_bool
 c_sglx_getParamsImecProbe.argtypes = [POINTER(c_int), c_void_p, c_int]
 
-# Get parameters for given logical OneBox.
+# Get parameters for selected OneBox.
 # These are a set of 'key=value' strings.
 # If successful, nval is the string count.
 # See c_sglx_getstr().
-# ok = c_sglx_getParamsOneBox( byref(nval), hSglx, ip )
+# To reference a OneBox configured as a recording stream
+# set ip to its stream-id; if ip >= 0, slot is ignored.
+# Any selected OneBox can also be referenced by setting
+# ip = -1, and giving its slot index.
+# ok = c_sglx_getParamsOneBox( byref(nval), hSglx, ip, slot )
 #
 c_sglx_getParamsOneBox = sglx.c_sglx_getParamsOneBox
 c_sglx_getParamsOneBox.restype = c_bool
-c_sglx_getParamsOneBox.argtypes = [POINTER(c_int), c_void_p, c_int]
+c_sglx_getParamsOneBox.argtypes = [POINTER(c_int), c_void_p, c_int, c_int]
 
 # Get string with format:
 # (probeID,nShanks,partNumber)()...
@@ -553,17 +557,21 @@ c_sglx_setKVParamsImecProbe = sglx.c_sglx_setKVParamsImecProbe
 c_sglx_setKVParamsImecProbe.restype = c_bool
 c_sglx_setKVParamsImecProbe.argtypes = [c_void_p, c_int]
 
-# The inverse of c_sglx_getParamsOneBox, this sets parameters
-# for a given logical OneBox. Parameters are key-value pairs.
+# The inverse of c_sglx_getParamsOneBox, this sets params
+# for a selected OneBox. Parameters are key-value pairs.
 # See c_sglx_setkv(). The call will error if a run is currently
 # in progress.
+# To reference a OneBox configured as a recording stream
+# set ip to its stream-id; if ip >= 0, slot is ignored.
+# Any selected OneBox can also be referenced by setting
+# ip = -1, and giving its slot index.
 #
 # Note: You can set any subset of fields under [SerialNumberToOneBox]/SNjjj.
-# ok = c_sglx_setKVParamsOneBox( hSglx, ip )
+# ok = c_sglx_setKVParamsOneBox( hSglx, ip, slot )
 #
 c_sglx_setKVParamsOneBox = sglx.c_sglx_setKVParamsOneBox
 c_sglx_setKVParamsOneBox.restype = c_bool
-c_sglx_setKVParamsOneBox.argtypes = [c_void_p, c_int]
+c_sglx_setKVParamsOneBox.argtypes = [c_void_p, c_int, c_int]
 
 # Set multi-drive run-splitting on/off.
 # ok = c_sglx_setMultiDriveEnable( hSglx, enable )

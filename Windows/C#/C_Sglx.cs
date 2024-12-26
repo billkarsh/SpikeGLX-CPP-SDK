@@ -248,13 +248,17 @@ namespace C_Sglx_namespace
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_getParamsImecProbe(out int nval, IntPtr hSglx, int ip);
 
-// Get parameters for given logical OneBox.
+// Get parameters for selected OneBox.
 // These are a set of 'key=value' strings.
 // If successful, nval is the string count.
 // See c_sglx_getstr().
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
 //
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        public static extern int c_sglx_getParamsOneBox(out int nval, IntPtr hSglx, int ip);
+        public static extern int c_sglx_getParamsOneBox(out int nval, IntPtr hSglx, int ip, int slot);
 
 // Get string with format:
 // (probeID,nShanks,partNumber)()...
@@ -512,15 +516,19 @@ namespace C_Sglx_namespace
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_setKVParamsImecProbe(IntPtr hSglx, int ip);
 
-// The inverse of c_sglx_getParamsOneBox, this sets parameters
-// for a given logical OneBox. Parameters are key-value pairs.
+// The inverse of c_sglx_getParamsOneBox, this sets params
+// for a selected OneBox. Parameters are key-value pairs.
 // See c_sglx_setkv(). The call will error if a run is currently
 // in progress.
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
 //
 // Note: You can set any subset of fields under [SerialNumberToOneBox]/SNjjj.
 //
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        public static extern int c_sglx_setKVParamsOneBox(IntPtr hSglx, int ip);
+        public static extern int c_sglx_setKVParamsOneBox(IntPtr hSglx, int ip, int slot);
 
 // Set multi-drive run-splitting on/off.
 //

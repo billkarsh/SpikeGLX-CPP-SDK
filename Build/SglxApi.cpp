@@ -307,11 +307,12 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecProbe(
 SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
     T_sglx_get_strs     &kv,
     void                *hSglx,
-    int                 ip )
+    int                 ip,
+    int                 slot )
 {
     Comm    C;
     char    cmd[32];
-    sprintf( cmd, "GETPARAMSOBX %d", ip );
+    sprintf( cmd, "GETPARAMSOBX %d %d", ip, slot );
 
     try {
         return C.doNLineQuery( kv, HS, cmd );
@@ -1053,14 +1054,15 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsOneBox(
     void                    *hSglx,
     T_sglx_set_keyvals      &kv,
-    int                     ip )
+    int                     ip,
+    int                     slot )
 {
     Comm    C;
     char    cmd[32];
 
     try {
         C.checkConn( HS );
-        sprintf( cmd, "SETPARAMSOBX %d\n", ip );
+        sprintf( cmd, "SETPARAMSOBX %d %d\n", ip, slot );
         C.sendString( HS, cmd );
         C.receiveREADY( HS, "SETPARAMSOBX" );
 

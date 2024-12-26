@@ -3,6 +3,8 @@ AS OF 20241215
 ==============
 
 - sglx_setDigitalOut replaced by sglx_set_NI_DO.
+- sglx_getParamsOneBox takes (... ip, slot)
+- sglx_setParamsOneBox takes (... ip, slot)
 
 ==============
 AS OF 20240129
