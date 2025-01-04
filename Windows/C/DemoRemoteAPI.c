@@ -317,17 +317,17 @@ void latency_test()
 
     if( c_sglx_connect( hSglx, addr, port ) ) {
 
-        double      mv2i16  = 1.0/(1200.0/250/1024);
-        t_ull       fromCt;
-        const short *data;
-        const char  *line   = "Dev4/port0/line5";
-        int         js      = 2,
-                    ip      = 0,
-                    nC      = 385,
-                    id      = 393 - 384,
-                    thresh  = 0.45*mv2i16,
-                    ndata;
-        bool        level   = 0;
+        double          mv2i16  = 1.0/(1200.0/250/1024);
+        t_ull           fromCt;
+        const short     *data;
+        const char      *line   = "Dev4/port0/line5";
+        unsigned int    bits    = 0;
+        int             js      = 2,
+                        ip      = 0,
+                        nC      = 385,
+                        id      = 393 - 384,
+                        thresh  = 0.45*mv2i16,
+                        ndata;
 
         printf( "Threshold %d\n", thresh );
 
@@ -339,7 +339,7 @@ void latency_test()
         if( !(fromCt = c_sglx_getStreamSampleCount( hSglx, js, ip )) )
             goto error;
 
-        if( !c_sglx_setDigitalOut( hSglx, level, line ) )
+        if( !c_sglx_set_NI_DO( hSglx, line, bits ) )
             goto error;
 
         for( ;; ) {
@@ -356,13 +356,13 @@ void latency_test()
                 int     diff  = data[id + (tpts-1)*nC] - data[id];
                 bool    digOK = true;
 
-                if( diff > thresh && level == 0 ) {
-                    level = 1;
-                    digOK = c_sglx_setDigitalOut( hSglx, level, line );
+                if( diff > thresh && bits == 0 ) {
+                    bits  = 0xFFFFFFFF;
+                    digOK = c_sglx_set_NI_DO( hSglx, line, bits );
                 }
-                else if( diff < -thresh && level == 1 ) {
-                    level = 0;
-                    digOK = c_sglx_setDigitalOut( hSglx, level, line );
+                else if( diff < -thresh && bits == 0xFFFFFFFF ) {
+                    bits  = 0;
+                    digOK = c_sglx_set_NI_DO( hSglx, line, bits );
                 }
 
                 if( !digOK )

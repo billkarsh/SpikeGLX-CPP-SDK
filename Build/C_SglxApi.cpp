@@ -605,15 +605,6 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_setDataDir(
 }
 
 
-SGLX_EXPORT bool SGLX_CALL c_sglx_set_NI_DO(
-    void            *hSglx,
-    const char      *lines,
-    unsigned int    bits )
-{
-    return sglx_set_NI_DO( hSglx, lines, bits );
-}
-
-
 SGLX_EXPORT bool SGLX_CALL c_sglx_setKVMetadata( void *hSglx )
 {
     cClient_sglx_set_keyvals    kv( HS->xmstrstr );
@@ -663,6 +654,25 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_setMultiDriveEnable( void *hSglx, bool enable 
 SGLX_EXPORT bool SGLX_CALL c_sglx_setNextFileName( void *hSglx, const char *name )
 {
     return sglx_setNextFileName( hSglx, name );
+}
+
+
+SGLX_EXPORT bool SGLX_CALL c_sglx_set_NI_DO(
+    void            *hSglx,
+    const char      *lines,
+    unsigned int    bits )
+{
+    return sglx_set_NI_DO( hSglx, lines, bits );
+}
+
+
+SGLX_EXPORT bool SGLX_CALL c_sglx_set_OBX_AO(
+    void            *hSglx,
+    int             ip,
+    int             slot,
+    const char      *chn_vlt )
+{
+    return sglx_set_OBX_AO( hSglx, ip, slot, chn_vlt );
 }
 
 

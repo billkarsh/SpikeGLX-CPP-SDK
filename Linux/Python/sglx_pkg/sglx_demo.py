@@ -243,7 +243,7 @@ def latency_test():
         mv2i16 = 1.0/(1200.0/250/1024)
         thresh = 0.45*mv2i16
         id     = 393 - 384
-        level  = 0
+        bits   = 0
         line   = "Dev4/port0/line5"
 
         print( "Threshold {}\n".format( thresh ) )
@@ -251,7 +251,7 @@ def latency_test():
         fromCt = sglx.c_sglx_getStreamSampleCount( hSglx, js, ip )
 
         if fromCt > 0:
-            ok = sglx.sglx_set_NI_DO( hSglx, line.encode(), level )
+            ok = sglx.sglx_set_NI_DO( hSglx, line.encode(), bits )
 
             if ok:
                 while True:
@@ -266,12 +266,12 @@ def latency_test():
                         diff  = data[id + (tpts-1)*nC] - data[id]
                         digOK = True
 
-                        if diff > thresh and level == 0:
-                            level = 0xFFFFFFFF
-                            digOK = sglx.sglx_set_NI_DO( hSglx, line.encode(), level )
-                        elif diff < -thresh and level == 0xFFFFFFFF:
-                            level = 0
-                            digOK = sglx.sglx_set_NI_DO( hSglx, line.encode(), level )
+                        if diff > thresh and bits == 0:
+                            bits  = 0xFFFFFFFF
+                            digOK = sglx.sglx_set_NI_DO( hSglx, line.encode(), bits )
+                        elif diff < -thresh and bits == 0xFFFFFFFF:
+                            bits  = 0
+                            digOK = sglx.sglx_set_NI_DO( hSglx, line.encode(), bits )
 
                         if not digOK:
                             break

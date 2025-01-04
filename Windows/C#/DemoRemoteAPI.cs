@@ -305,12 +305,12 @@ error:
                 short[] data;
                 int[] channels = new int[385];
                 string line = "Dev4/port0/line5";
+                uint bits = 0;
                 int js = 2,
                     ip = 0,
                     nC = 385,
                     id = 393 - 384,
-                    thresh = (int)(0.45 * mv2i16),
-                    level = 0;
+                    thresh = (int)(0.45 * mv2i16);
 
                 Console.WriteLine("Threshold {0}\n", thresh);
 
@@ -324,7 +324,7 @@ error:
                     goto error;
                 }
 
-                ok = C_Sglx.c_sglx_set_NI_DO(hSglx, line, level);
+                ok = C_Sglx.c_sglx_set_NI_DO(hSglx, line, bits);
                 if (ok == 0)
                     goto error;
 
@@ -346,15 +346,15 @@ error:
                         int diff = data[id + (tpts - 1) * nC] - data[id],
                             digOK = 1;
 
-                        if (diff > thresh && level == 0)
+                        if (diff > thresh && bits == 0)
                         {
-                            level = 0xFFFFFFFF;
-                            digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, level);
+                            bits = 0xFFFFFFFF;
+                            digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, bits);
                         }
-                        else if (diff < -thresh && level == 0xFFFFFFFF)
+                        else if (diff < -thresh && bits == 0xFFFFFFFF)
                         {
-                            level = 0;
-                            digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, level);
+                            bits = 0;
+                            digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, bits);
                         }
 
                         if (digOK == 0)

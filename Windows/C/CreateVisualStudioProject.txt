@@ -18,7 +18,7 @@
 		Precompiled Header: Not Using Precompiled Headers.
 8. Right-click on the Demo project in the Solution window and get Property Pages.
 	under C/C++/General:
-		Additional Include Directories: add SDK folders {API, CPP}.
+		Additional Include Directories: add SDK folders {API, C}.
 	under Linker/General:
 		Additional Library Directories: add SDK folder {API}.
 	under C/C++/Preprocessor:

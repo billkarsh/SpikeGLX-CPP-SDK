@@ -914,22 +914,6 @@ SGLX_EXPORT bool SGLX_CALL sglx_setDataDir(
 }
 
 
-SGLX_EXPORT bool SGLX_CALL sglx_set_NI_DO(
-    void                *hSglx,
-    const std::string   &lines,
-    unsigned int        bits )
-{
-    Comm    C;
-    char    sbits[32];
-    sprintf( sbits, " %d", bits );
-
-    try {
-        return C.doCommand( HS, string("SETNIDO ") + HS->cpp_get_str(lines) + sbits );
-    }
-    CATCH()
-}
-
-
 SGLX_EXPORT bool SGLX_CALL sglx_setMetadata(
     void                    *hSglx,
     T_sglx_set_keyvals      &kv )
@@ -974,6 +958,39 @@ SGLX_EXPORT bool SGLX_CALL sglx_setNextFileName(
 
     try {
         return C.doCommand( HS, string("SETNEXTFILENAME ") + HS->cpp_get_str(name) );
+    }
+    CATCH()
+}
+
+
+SGLX_EXPORT bool SGLX_CALL sglx_set_NI_DO(
+    void                *hSglx,
+    const std::string   &lines,
+    unsigned int        bits )
+{
+    Comm    C;
+    char    sbits[32];
+    sprintf( sbits, " %d", bits );
+
+    try {
+        return C.doCommand( HS, string("SETNIDO ") + HS->cpp_get_str(lines) + sbits );
+    }
+    CATCH()
+}
+
+
+SGLX_EXPORT bool SGLX_CALL sglx_set_OBX_AO(
+    void                *hSglx,
+    int                 ip,
+    int                 slot,
+    const std::string   &chn_vlt )
+{
+    Comm    C;
+    char    cmd[32];
+    sprintf( cmd, "SETOBXAO %d %d ", ip, slot );
+
+    try {
+        return C.doCommand( HS, string(cmd) + HS->cpp_get_str(chn_vlt) );
     }
     CATCH()
 }

@@ -461,7 +461,7 @@ c_sglx_par2.restype = c_bool
 c_sglx_par2.argtypes = [T_sglx_callback, c_void_p, c_char, c_char_p]
 
 # Set anatomy data string with Pinpoint format:
-# [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)(startpos,endpos,R,G,B,rgnname)…()
+# [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)(startpos,endpos,R,G,B,rgnname)...()
 #    - probe-id: SpikeGLX logical probe id.
 #    - shank-id: [0..n-shanks].
 #    - startpos: region start in microns from tip.
@@ -498,20 +498,6 @@ c_sglx_setAudioKVParams.argtypes = [c_void_p, c_char_p]
 c_sglx_setDataDir = sglx.c_sglx_setDataDir
 c_sglx_setDataDir.restype = c_bool
 c_sglx_setDataDir.argtypes = [c_void_p, c_int, c_char_p]
-
-# Set one or more NI lines high/low.
-#   - lines is a string list of lines to set, e.g.:
-#       'Dev6/port0/line2,Dev6/port0/line5'
-#       'Dev6/port1/line0:3'
-#       'Dev6/port1:2'
-#   - bits is a uint32 value, each bit maps to a line:
-#       The lowest 8 bits map to port 0.
-#       The next higher 8 bits map to port 1, etc.
-# ok = c_sglx_set_NI_DO( hSglx, lines, bits )
-#
-c_sglx_set_NI_DO = sglx.c_sglx_set_NI_DO
-c_sglx_set_NI_DO.restype = c_bool
-c_sglx_set_NI_DO.argtypes = [c_void_p, c_char_p, c_int]
 
 # If a run is in progress, set metadata to be added to
 # the next output file-set. Metadata are key-value pairs.
@@ -614,6 +600,38 @@ c_sglx_setMultiDriveEnable.argtypes = [c_void_p, c_bool]
 c_sglx_setNextFileName = sglx.c_sglx_setNextFileName
 c_sglx_setNextFileName.restype = c_bool
 c_sglx_setNextFileName.argtypes = [c_void_p, c_char_p]
+
+# Set one or more NI lines high/low.
+#   - lines is a string list of lines to set, e.g.:
+#       'Dev6/port0/line2,Dev6/port0/line5'
+#       'Dev6/port1/line0:3'
+#       'Dev6/port1:2'
+#   - bits is a uint32 value, each bit maps to a line:
+#       The lowest 8 bits map to port 0.
+#       The next higher 8 bits map to port 1, etc.
+# ok = c_sglx_set_NI_DO( hSglx, lines, bits )
+#
+c_sglx_set_NI_DO = sglx.c_sglx_set_NI_DO
+c_sglx_set_NI_DO.restype = c_bool
+c_sglx_set_NI_DO.argtypes = [c_void_p, c_char_p, c_uint]
+
+# Set one or more OneBox AO (DAC) channel voltages.
+# - chn_vlt is a string with format: (chan,volts)(chan,volts)...()
+# - The chan values are integer AO indices in range [0,11].
+# - You can only use AO channels already listed on the OBX setup tab.
+# - Voltages are double values in range [-5.0,5.0] V.
+# - DAC is 16-bit; theoretical resolution is (10 V)/(2^16) ~ .0001526 V.
+# - Practical resolution, given noise, appears to be ~ 0.002 V.
+# - AO channels are disabled at run start/end; voltage ~ 1.56 V.
+# To reference a OneBox configured as a recording stream
+# set ip to its stream-id; if ip >= 0, slot is ignored.
+# Any selected OneBox can also be referenced by setting
+# ip = -1, and giving its slot index.
+# ok = c_sglx_set_OBX_AO( hSglx, ip, slot, chn_vlt )
+#
+c_sglx_set_OBX_AO = sglx.c_sglx_set_OBX_AO
+c_sglx_set_OBX_AO.restype = c_bool
+c_sglx_set_OBX_AO.argtypes = [c_void_p, c_int, c_int, c_char_p]
 
 # Set gate (file writing) on/off during run.
 #

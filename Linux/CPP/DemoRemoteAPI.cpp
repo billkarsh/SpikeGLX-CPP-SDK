@@ -9,7 +9,7 @@
 using namespace std;
 
 // Edit the server address/port here
-static const char*  addr = "10.11.12.1";
+static const char*  addr = "localhost";
 static int          port = 4142;
 
 
@@ -250,10 +250,10 @@ void latency_test()
         double                  mv2i16  = 1.0/(1200.0/250/1024);
         const char              *line   = "Dev4/port0/line5";
         t_ull                   fromCt;
+        unsigned int            bits    = 0;
         int                     nC      = 385,
                                 id      = 393 - 384,
                                 thresh  = 0.45*mv2i16;
-        bool                    level   = 0;
 
         printf( "Threshold %d\n", thresh );
 
@@ -269,7 +269,7 @@ void latency_test()
         if( !(fromCt = sglx_getStreamSampleCount( hSglx, io.js, io.ip )) )
             goto error;
 
-        if( !sglx_set_NI_DO( hSglx, line, level ) )
+        if( !sglx_set_NI_DO( hSglx, line, bits ) )
             goto error;
 
         for( ;; ) {
@@ -286,13 +286,13 @@ void latency_test()
                 int     diff  = io.data[id + (tpts-1)*nC] - io.data[id];
                 bool    digOK = true;
 
-                if( diff > thresh && level == 0 ) {
-                    level = 0xFFFFFFFF;
-                    digOK = sglx_set_NI_DO( hSglx, line, level );
+                if( diff > thresh && bits == 0 ) {
+                    bits  = 0xFFFFFFFF;
+                    digOK = sglx_set_NI_DO( hSglx, line, bits );
                 }
-                else if( diff < -thresh && level == 0xFFFFFFFF ) {
-                    level = 0;
-                    digOK = sglx_set_NI_DO( hSglx, line, level );
+                else if( diff < -thresh && bits == 0xFFFFFFFF ) {
+                    bits  = 0;
+                    digOK = sglx_set_NI_DO( hSglx, line, bits );
                 }
 
                 if( !digOK )
