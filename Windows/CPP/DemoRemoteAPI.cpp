@@ -287,10 +287,10 @@ void latency_test()
                 bool    digOK = true;
 
                 if( diff > thresh && bits == 0 ) {
-                    bits  = 0xFFFFFFFF;
+                    bits  = 0xFF;
                     digOK = sglx_set_NI_DO( hSglx, line, bits );
                 }
-                else if( diff < -thresh && bits == 0xFFFFFFFF ) {
+                else if( diff < -thresh && bits == 0xFF ) {
                     bits  = 0;
                     digOK = sglx_set_NI_DO( hSglx, line, bits );
                 }

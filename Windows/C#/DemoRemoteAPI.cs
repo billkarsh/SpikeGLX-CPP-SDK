@@ -348,10 +348,10 @@ error:
 
                         if (diff > thresh && bits == 0)
                         {
-                            bits = 0xFFFFFFFF;
+                            bits = 0xFF;
                             digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, bits);
                         }
-                        else if (diff < -thresh && bits == 0xFFFFFFFF)
+                        else if (diff < -thresh && bits == 0xFF)
                         {
                             bits = 0;
                             digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, bits);

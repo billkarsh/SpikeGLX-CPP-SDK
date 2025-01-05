@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from platform import python_version
+from sys import version_info
 from ctypes import *
 
-if python_version() >= "3.8.0":
-    sglx = CDLL( "SglxApi.dll", windmode=0 )
+if version_info >= (3,8):
+    sglx = CDLL( "SglxApi.dll", winmode=0 )
 else:
     sglx = CDLL( "SglxApi.dll" )
 
