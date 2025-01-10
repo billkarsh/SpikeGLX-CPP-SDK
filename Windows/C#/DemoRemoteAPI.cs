@@ -324,7 +324,7 @@ error:
                     goto error;
                 }
 
-                ok = C_Sglx.c_sglx_set_NI_DO(hSglx, line, bits);
+                ok = C_Sglx.c_sglx_ni_DO_set(hSglx, line, bits);
                 if (ok == 0)
                     goto error;
 
@@ -349,12 +349,12 @@ error:
                         if (diff > thresh && bits == 0)
                         {
                             bits = 0xFF;
-                            digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, bits);
+                            digOK = C_Sglx.c_sglx_ni_DO_set(hSglx, line, bits);
                         }
                         else if (diff < -thresh && bits == 0xFF)
                         {
                             bits = 0;
-                            digOK = C_Sglx.c_sglx_set_NI_DO(hSglx, line, bits);
+                            digOK = C_Sglx.c_sglx_ni_DO_set(hSglx, line, bits);
                         }
 
                         if (digOK == 0)

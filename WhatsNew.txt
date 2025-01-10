@@ -4,8 +4,8 @@ AS OF 20241215
 
 - sglx_getParamsOneBox takes (... ip, slot).
 - sglx_setParamsOneBox takes (... ip, slot).
-- sglx_setDigitalOut replaced by sglx_set_NI_DO.
-- Add sglx_set_OBX_AO.
+- sglx_setDigitalOut replaced by sglx_ni_DO_set.
+- Add sglx_obx_AO_set.
 
 ==============
 AS OF 20240129

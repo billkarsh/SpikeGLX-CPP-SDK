@@ -409,6 +409,34 @@ namespace C_Sglx_namespace
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern ulong c_sglx_mapSample(IntPtr hSglx, int dstjs, int dstip, ulong srcSample, int srcjs, int srcip);
 
+// Set one or more NI lines high/low.
+//   - lines is a string list of lines to set, e.g.:
+//       'Dev6/port0/line2,Dev6/port0/line5'
+//       'Dev6/port1/line0:3'
+//       'Dev6/port1:2'
+//   - bits is a uint32 value, each bit maps to a line:
+//       The lowest 8 bits map to port 0.
+//       The next higher 8 bits map to port 1, etc.
+//
+        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern int c_sglx_ni_DO_set(IntPtr hSglx, [MarshalAs(UnmanagedType.LPStr)] string channels, uint bits);
+
+// Set one or more OneBox AO (DAC) channel voltages.
+// - chn_vlt is a string with format: (chan,volts)(chan,volts)...()
+// - The chan values are integer AO indices in range [0,11].
+// - You can only use AO channels already listed on the OBX setup tab.
+// - Voltages are double values in range [-5.0,5.0] V.
+// - DAC is 16-bit; theoretical resolution is (10 V)/(2^16) ~ .0001526 V.
+// - Practical resolution, given noise, appears to be ~ 0.002 V.
+// - AO channels are disabled at run start/end; voltage ~ 1.56 V.
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
+//
+        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern int c_sglx_obx_AO_set(IntPtr hSglx, int ip, int slot, [MarshalAs(UnmanagedType.LPStr)] string chn_vlt);
+
 // Direct emission to specified site (-1=dark).
 // ip:    imec probe index.
 // color: {0=blue, 1=red}.
@@ -555,34 +583,6 @@ namespace C_Sglx_namespace
 //
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_setNextFileName(IntPtr hSglx, [MarshalAs(UnmanagedType.LPStr)] string name);
-
-// Set one or more NI lines high/low.
-//   - lines is a string list of lines to set, e.g.:
-//       'Dev6/port0/line2,Dev6/port0/line5'
-//       'Dev6/port1/line0:3'
-//       'Dev6/port1:2'
-//   - bits is a uint32 value, each bit maps to a line:
-//       The lowest 8 bits map to port 0.
-//       The next higher 8 bits map to port 1, etc.
-//
-        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        public static extern int c_sglx_set_NI_DO(IntPtr hSglx, [MarshalAs(UnmanagedType.LPStr)] string channels, uint bits);
-
-// Set one or more OneBox AO (DAC) channel voltages.
-// - chn_vlt is a string with format: (chan,volts)(chan,volts)...()
-// - The chan values are integer AO indices in range [0,11].
-// - You can only use AO channels already listed on the OBX setup tab.
-// - Voltages are double values in range [-5.0,5.0] V.
-// - DAC is 16-bit; theoretical resolution is (10 V)/(2^16) ~ .0001526 V.
-// - Practical resolution, given noise, appears to be ~ 0.002 V.
-// - AO channels are disabled at run start/end; voltage ~ 1.56 V.
-// To reference a OneBox configured as a recording stream
-// set ip to its stream-id; if ip >= 0, slot is ignored.
-// Any selected OneBox can also be referenced by setting
-// ip = -1, and giving its slot index.
-//
-        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
-        public static extern int c_sglx_set_OBX_AO(IntPtr hSglx, int ip, int slot, [MarshalAs(UnmanagedType.LPStr)] string chn_vlt);
 
 // Set gate (file writing) on/off during run.
 //

@@ -533,6 +533,25 @@ SGLX_EXPORT t_ull SGLX_CALL c_sglx_mapSample(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL c_sglx_ni_DO_set(
+    void            *hSglx,
+    const char      *lines,
+    unsigned int    bits )
+{
+    return sglx_ni_DO_set( hSglx, lines, bits );
+}
+
+
+SGLX_EXPORT bool SGLX_CALL c_sglx_obx_AO_set(
+    void            *hSglx,
+    int             ip,
+    int             slot,
+    const char      *chn_vlt )
+{
+    return sglx_obx_AO_set( hSglx, ip, slot, chn_vlt );
+}
+
+
 SGLX_EXPORT bool SGLX_CALL c_sglx_opto_emit(
     void    *hSglx,
     int     ip,
@@ -654,25 +673,6 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_setMultiDriveEnable( void *hSglx, bool enable 
 SGLX_EXPORT bool SGLX_CALL c_sglx_setNextFileName( void *hSglx, const char *name )
 {
     return sglx_setNextFileName( hSglx, name );
-}
-
-
-SGLX_EXPORT bool SGLX_CALL c_sglx_set_NI_DO(
-    void            *hSglx,
-    const char      *lines,
-    unsigned int    bits )
-{
-    return sglx_set_NI_DO( hSglx, lines, bits );
-}
-
-
-SGLX_EXPORT bool SGLX_CALL c_sglx_set_OBX_AO(
-    void            *hSglx,
-    int             ip,
-    int             slot,
-    const char      *chn_vlt )
-{
-    return sglx_set_OBX_AO( hSglx, ip, slot, chn_vlt );
 }
 
 
