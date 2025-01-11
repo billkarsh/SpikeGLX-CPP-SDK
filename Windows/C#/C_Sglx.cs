@@ -252,6 +252,7 @@ namespace C_Sglx_namespace
 // These are a set of 'key=value' strings.
 // If successful, nval is the string count.
 // See c_sglx_getstr().
+//
 // To reference a OneBox configured as a recording stream
 // set ip to its stream-id; if ip >= 0, slot is ignored.
 // Any selected OneBox can also be referenced by setting
@@ -429,6 +430,7 @@ namespace C_Sglx_namespace
 // - DAC is 16-bit; theoretical resolution is (10 V)/(2^16) ~ .0001526 V.
 // - Practical resolution, given noise, appears to be ~ 0.002 V.
 // - AO channels are disabled at run start/end; voltage ~ 1.56 V.
+//
 // To reference a OneBox configured as a recording stream
 // set ip to its stream-id; if ip >= 0, slot is ignored.
 // Any selected OneBox can also be referenced by setting
@@ -436,6 +438,68 @@ namespace C_Sglx_namespace
 //
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_obx_AO_set(IntPtr hSglx, int ip, int slot, [MarshalAs(UnmanagedType.LPStr)] string chn_vlt);
+
+// General sequence:
+// 1. OBX_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+// 2. OBX_Wave_Arm       : Set triggering parameters.
+// 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
+//
+// Set trigger method, and playback mode.
+// - Trigger values...Playback starts:
+//     -2   : By calling OBX_Wave_StartStop.
+//     -1   : When TTL rising edge sent to SMA1.
+//     0-11 : When TTL rising edge sent to that XA (ADC) channel.
+// - To use an ADC channel, you must name it as an XA channel on
+//   the OBX setup tab of the Acquisition Configuration dialog.
+// - Multiple trigger events can be given without needing to rearm.
+// - The playback modes are: {1=loop until stopped, 0=once only}.
+//
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
+//
+        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern int c_sglx_obx_wave_arm(IntPtr hSglx, int ip, int slot, int trig, int loop);
+
+// General sequence:
+// 1. OBX_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+// 2. OBX_Wave_Arm       : Set triggering parameters.
+// 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
+//
+// Load a wave descriptor already placed in SpikeGLX/_Waves.
+// - Pass 'mywavename' to this function; no path; no extension.
+//
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
+//
+        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern int c_sglx_obx_wave_load(IntPtr hSglx, int ip, int slot, [MarshalAs(UnmanagedType.LPStr)] string wave);
+
+// General sequence:
+// 1. OBX_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+// 2. OBX_Wave_Arm       : Set triggering parameters.
+// 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
+//
+// Start (optionally) or stop wave playback.
+// - If you selected software triggering with OBX_Wave_Arm,
+//   then set start_bool=1 to start playback.
+// - In all cases, set start_bool=0 to stop playback.
+// - It is best to stop playback before changing wave parameters.
+// - Waves only play at AO (DAC) channel-0.
+// - To use the waveplayer, you must name channel AO-0 on
+//   the OBX setup tab of the Acquisition Configuration dialog.
+// - After playback, the voltage remains at the last programmed level.
+//
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
+//
+        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern int c_sglx_obx_wave_startstop(IntPtr hSglx, int ip, int slot, int start);
 
 // Direct emission to specified site (-1=dark).
 // ip:    imec probe index.
@@ -536,6 +600,7 @@ namespace C_Sglx_namespace
 // for a selected OneBox. Parameters are key-value pairs.
 // See c_sglx_setkv(). The call will error if a run is currently
 // in progress.
+//
 // To reference a OneBox configured as a recording stream
 // set ip to its stream-id; if ip >= 0, slot is ignored.
 // Any selected OneBox can also be referenced by setting

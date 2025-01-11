@@ -253,6 +253,7 @@ c_sglx_getParamsImecProbe.argtypes = [POINTER(c_int), c_void_p, c_int]
 # These are a set of 'key=value' strings.
 # If successful, nval is the string count.
 # See c_sglx_getstr().
+#
 # To reference a OneBox configured as a recording stream
 # set ip to its stream-id; if ip >= 0, slot is ignored.
 # Any selected OneBox can also be referenced by setting
@@ -448,6 +449,7 @@ c_sglx_ni_DO_set.argtypes = [c_void_p, c_char_p, c_uint]
 # - DAC is 16-bit; theoretical resolution is (10 V)/(2^16) ~ .0001526 V.
 # - Practical resolution, given noise, appears to be ~ 0.002 V.
 # - AO channels are disabled at run start/end; voltage ~ 1.56 V.
+#
 # To reference a OneBox configured as a recording stream
 # set ip to its stream-id; if ip >= 0, slot is ignored.
 # Any selected OneBox can also be referenced by setting
@@ -457,6 +459,71 @@ c_sglx_ni_DO_set.argtypes = [c_void_p, c_char_p, c_uint]
 c_sglx_obx_AO_set = sglx.c_sglx_obx_AO_set
 c_sglx_obx_AO_set.restype = c_bool
 c_sglx_obx_AO_set.argtypes = [c_void_p, c_int, c_int, c_char_p]
+
+# General sequence:
+# 1. OBX_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+# 2. OBX_Wave_Arm       : Set triggering parameters.
+# 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
+#
+# Set trigger method, and playback mode.
+# - Trigger values...Playback starts:
+#     -2   : By calling OBX_Wave_StartStop.
+#     -1   : When TTL rising edge sent to SMA1.
+#     0-11 : When TTL rising edge sent to that XA (ADC) channel.
+# - To use an ADC channel, you must name it as an XA channel on
+#   the OBX setup tab of the Acquisition Configuration dialog.
+# - Multiple trigger events can be given without needing to rearm.
+# - The playback modes are: {1=loop until stopped, 0=once only}.
+#
+# To reference a OneBox configured as a recording stream
+# set ip to its stream-id; if ip >= 0, slot is ignored.
+# Any selected OneBox can also be referenced by setting
+# ip = -1, and giving its slot index.
+#
+c_sglx_obx_wave_arm = sglx.c_sglx_obx_wave_arm
+c_sglx_obx_wave_arm.restype = c_bool
+c_sglx_obx_wave_arm.argtypes = [c_void_p, c_int, c_int, c_int, c_bool]
+
+# General sequence:
+# 1. OBX_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+# 2. OBX_Wave_Arm       : Set triggering parameters.
+# 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
+#
+# Load a wave descriptor already placed in SpikeGLX/_Waves.
+# - Pass 'mywavename' to this function; no path; no extension.
+#
+# To reference a OneBox configured as a recording stream
+# set ip to its stream-id; if ip >= 0, slot is ignored.
+# Any selected OneBox can also be referenced by setting
+# ip = -1, and giving its slot index.
+#
+c_sglx_obx_wave_load = sglx.c_sglx_obx_wave_load
+c_sglx_obx_wave_load.restype = c_bool
+c_sglx_obx_wave_load.argtypes = [c_void_p, c_int, c_int, c_char_p]
+
+# General sequence:
+# 1. OBX_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+# 2. OBX_Wave_Arm       : Set triggering parameters.
+# 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
+#
+# Start (optionally) or stop wave playback.
+# - If you selected software triggering with OBX_Wave_Arm,
+#   then set start_bool=1 to start playback.
+# - In all cases, set start_bool=0 to stop playback.
+# - It is best to stop playback before changing wave parameters.
+# - Waves only play at AO (DAC) channel-0.
+# - To use the waveplayer, you must name channel AO-0 on
+#   the OBX setup tab of the Acquisition Configuration dialog.
+# - After playback, the voltage remains at the last programmed level.
+#
+# To reference a OneBox configured as a recording stream
+# set ip to its stream-id; if ip >= 0, slot is ignored.
+# Any selected OneBox can also be referenced by setting
+# ip = -1, and giving its slot index.
+#
+c_sglx_obx_wave_startstop = sglx.c_sglx_obx_wave_startstop
+c_sglx_obx_wave_startstop.restype = c_bool
+c_sglx_obx_wave_startstop.argtypes = [c_void_p, c_int, c_int, c_bool]
 
 # Direct emission to specified site (-1=dark).
 # ip:    imec probe index.
@@ -579,6 +646,7 @@ c_sglx_setKVParamsImecProbe.argtypes = [c_void_p, c_int]
 # for a selected OneBox. Parameters are key-value pairs.
 # See c_sglx_setkv(). The call will error if a run is currently
 # in progress.
+#
 # To reference a OneBox configured as a recording stream
 # set ip to its stream-id; if ip >= 0, slot is ignored.
 # Any selected OneBox can also be referenced by setting

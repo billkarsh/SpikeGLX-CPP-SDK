@@ -394,6 +394,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsImecProbe(
 
 // Get parameters for selected OneBox.
 // These are (key,value) pairs.
+//
 // To reference a OneBox configured as a recording stream
 // set ip to its stream-id; if ip >= 0, slot is ignored.
 // Any selected OneBox can also be referenced by setting
@@ -583,6 +584,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_ni_DO_set(
 // - DAC is 16-bit; theoretical resolution is (10 V)/(2^16) ~ .0001526 V.
 // - Practical resolution, given noise, appears to be ~ 0.002 V.
 // - AO channels are disabled at run start/end; voltage ~ 1.56 V.
+//
 // To reference a OneBox configured as a recording stream
 // set ip to its stream-id; if ip >= 0, slot is ignored.
 // Any selected OneBox can also be referenced by setting
@@ -593,6 +595,78 @@ SGLX_EXPORT bool SGLX_CALL sglx_obx_AO_set(
     int                 ip,
     int                 slot,
     const std::string   &chn_vlt );
+
+// General sequence:
+// 1. OBX_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+// 2. OBX_Wave_Arm       : Set triggering parameters.
+// 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
+//
+// Set trigger method, and playback mode.
+// - Trigger values...Playback starts:
+//     -2   : By calling OBX_Wave_StartStop.
+//     -1   : When TTL rising edge sent to SMA1.
+//     0-11 : When TTL rising edge sent to that XA (ADC) channel.
+// - To use an ADC channel, you must name it as an XA channel on
+//   the OBX setup tab of the Acquisition Configuration dialog.
+// - Multiple trigger events can be given without needing to rearm.
+// - The playback modes are: {1=loop until stopped, 0=once only}.
+//
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
+//
+SGLX_EXPORT bool SGLX_CALL sglx_obx_wave_arm(
+    void    *hSglx,
+    int     ip,
+    int     slot,
+    int     trig,
+    bool    loop );
+
+// General sequence:
+// 1. OBX_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+// 2. OBX_Wave_Arm       : Set triggering parameters.
+// 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
+//
+// Load a wave descriptor already placed in SpikeGLX/_Waves.
+// - Pass 'mywavename' to this function; no path; no extension.
+//
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
+//
+SGLX_EXPORT bool SGLX_CALL sglx_obx_wave_load(
+    void                *hSglx,
+    int                 ip,
+    int                 slot,
+    const std::string   &wave );
+
+// General sequence:
+// 1. OBX_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+// 2. OBX_Wave_Arm       : Set triggering parameters.
+// 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
+//
+// Start (optionally) or stop wave playback.
+// - If you selected software triggering with OBX_Wave_Arm,
+//   then set start_bool=1 to start playback.
+// - In all cases, set start_bool=0 to stop playback.
+// - It is best to stop playback before changing wave parameters.
+// - Waves only play at AO (DAC) channel-0.
+// - To use the waveplayer, you must name channel AO-0 on
+//   the OBX setup tab of the Acquisition Configuration dialog.
+// - After playback, the voltage remains at the last programmed level.
+//
+// To reference a OneBox configured as a recording stream
+// set ip to its stream-id; if ip >= 0, slot is ignored.
+// Any selected OneBox can also be referenced by setting
+// ip = -1, and giving its slot index.
+//
+SGLX_EXPORT bool SGLX_CALL sglx_obx_wave_startstop(
+    void    *hSglx,
+    int     ip,
+    int     slot,
+    bool    start );
 
 // Direct emission to specified site (-1=dark).
 // ip:    imec probe index.
@@ -651,9 +725,9 @@ SGLX_EXPORT bool SGLX_CALL sglx_setAudioEnable( void *hSglx, bool enable );
 // stops current output. Call sglx_setAudioEnable() to restart it.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setAudioParams(
-    void                    *hSglx,
-    const std::string       &group,
-    T_sglx_set_keyvals      &kv );
+    void                *hSglx,
+    const std::string   &group,
+    T_sglx_set_keyvals  &kv );
 
 // Set ith global data directory.
 // Set required parameter idir to zero for main data directory.
@@ -667,8 +741,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_setDataDir(
 // next output file-set.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setMetadata(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv );
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv );
 
 // Set multi-drive run-splitting on/off.
 //
@@ -714,8 +788,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_setNextFileName(
 // Note: You can set any subset of [DAQSettings].
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setParams(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv );
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv );
 
 // The inverse of sglx_getParamsImecCommon, this sets parameters
 // common to all enabled probes. The call will error if a run is
@@ -724,8 +798,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParams(
 // Note: You can set any subset of [DAQ_Imec_All].
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecCommon(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv );
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv );
 
 // The inverse of sglx_getParamsImecProbe, this sets parameters
 // for a given logical probe. The call will error if file writing
@@ -734,13 +808,14 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecCommon(
 // Note: You can set any subset of fields under [SerialNumberToProbe]/SNjjj.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv,
-    int                     ip );
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv,
+    int                 ip );
 
 // The inverse of sglx_getParamsOneBox, this sets params
 // for a selected OneBox. The call will error if a run is
 // currently in progress.
+//
 // To reference a OneBox configured as a recording stream
 // set ip to its stream-id; if ip >= 0, slot is ignored.
 // Any selected OneBox can also be referenced by setting
@@ -749,10 +824,10 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
 // Note: You can set any subset of fields under [SerialNumberToOneBox]/SNjjj.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsOneBox(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv,
-    int                     ip,
-    int                     slot );
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv,
+    int                 ip,
+    int                 slot );
 
 // Set gate (file writing) on/off during run.
 //

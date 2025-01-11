@@ -791,11 +791,63 @@ SGLX_EXPORT bool SGLX_CALL sglx_obx_AO_set(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL sglx_obx_wave_arm(
+    void    *hSglx,
+    int     ip,
+    int     slot,
+    int     trig,
+    bool    loop )
+{
+    Comm    C;
+    char    cmd[32];
+    sprintf( cmd, "OBWVARM %d %d %d %d", ip, slot, trig, loop );
+
+    try {
+        return C.doCommand( HS, cmd );
+    }
+    CATCH()
+}
+
+
+SGLX_EXPORT bool SGLX_CALL sglx_obx_wave_load(
+    void                *hSglx,
+    int                 ip,
+    int                 slot,
+    const std::string   &wave )
+{
+    Comm    C;
+    char    cmd[32];
+    sprintf( cmd, "OBWVLOAD %d %d ", ip, slot );
+
+    try {
+        return C.doCommand( HS, string(cmd) + HS->cpp_get_str(wave) );
+    }
+    CATCH()
+}
+
+
+SGLX_EXPORT bool SGLX_CALL sglx_obx_wave_startstop(
+    void    *hSglx,
+    int     ip,
+    int     slot,
+    bool    start )
+{
+    Comm    C;
+    char    cmd[32];
+    sprintf( cmd, "OBWVSTSP %d %d %d", ip, slot, start );
+
+    try {
+        return C.doCommand( HS, cmd );
+    }
+    CATCH()
+}
+
+
 SGLX_EXPORT bool SGLX_CALL sglx_opto_emit(
     void    *hSglx,
-    int         ip,
-    int         color,
-    int         site )
+    int     ip,
+    int     color,
+    int     site )
 {
     Comm    C;
     char    cmd[32];
@@ -908,9 +960,9 @@ SGLX_EXPORT bool SGLX_CALL sglx_setAudioEnable( void *hSglx, bool enable )
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setAudioParams(
-    void                    *hSglx,
-    const std::string       &group,
-    T_sglx_set_keyvals      &kv )
+    void                *hSglx,
+    const std::string   &group,
+    T_sglx_set_keyvals  &kv )
 {
     Comm    C;
 
@@ -948,8 +1000,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_setDataDir(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setMetadata(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv )
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv )
 {
     Comm    C;
 
@@ -997,8 +1049,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_setNextFileName(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setParams(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv )
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv )
 {
     Comm    C;
 
@@ -1020,8 +1072,8 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParams(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecCommon(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv )
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv )
 {
     Comm    C;
 
@@ -1043,9 +1095,9 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecCommon(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv,
-    int                     ip )
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv,
+    int                 ip )
 {
     Comm    C;
     char    cmd[32];
@@ -1069,10 +1121,10 @@ SGLX_EXPORT bool SGLX_CALL sglx_setParamsImecProbe(
 
 
 SGLX_EXPORT bool SGLX_CALL sglx_setParamsOneBox(
-    void                    *hSglx,
-    T_sglx_set_keyvals      &kv,
-    int                     ip,
-    int                     slot )
+    void                *hSglx,
+    T_sglx_set_keyvals  &kv,
+    int                 ip,
+    int                 slot )
 {
     Comm    C;
     char    cmd[32];

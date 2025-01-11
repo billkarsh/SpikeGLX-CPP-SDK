@@ -6,6 +6,9 @@ AS OF 20241215
 - sglx_setParamsOneBox takes (... ip, slot).
 - sglx_setDigitalOut replaced by sglx_ni_DO_set.
 - Add sglx_obx_AO_set.
+- Add sglx_obx_wave_arm.
+- Add sglx_obx_wave_load.
+- Add sglx_obx_wave_startstop.
 
 ==============
 AS OF 20240129

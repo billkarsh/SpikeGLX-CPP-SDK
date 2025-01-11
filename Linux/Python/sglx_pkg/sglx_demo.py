@@ -4,7 +4,8 @@ import sglx as sglx
 from ctypes import byref, POINTER, c_int, c_short, c_bool, c_char_p
 
 # Edit the server address/port here
-sglx_addr = "10.11.12.1"
+sglx_addr = "localhost"
+
 sglx_port = 4142
 
 

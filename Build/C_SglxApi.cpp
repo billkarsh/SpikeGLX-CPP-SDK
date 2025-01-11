@@ -217,11 +217,11 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_getGeomMap(
 
 
 SGLX_EXPORT bool SGLX_CALL c_sglx_getImecChanGains(
-    double      *APgain,
-    double      *LFgain,
-    void        *hSglx,
-    int         ip,
-    int         chan )
+    double  *APgain,
+    double  *LFgain,
+    void    *hSglx,
+    int     ip,
+    int     chan )
 {
     return sglx_getImecChanGains( *APgain, *LFgain, hSglx, ip, chan );
 }
@@ -543,12 +543,43 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_ni_DO_set(
 
 
 SGLX_EXPORT bool SGLX_CALL c_sglx_obx_AO_set(
-    void            *hSglx,
-    int             ip,
-    int             slot,
-    const char      *chn_vlt )
+    void        *hSglx,
+    int         ip,
+    int         slot,
+    const char  *chn_vlt )
 {
     return sglx_obx_AO_set( hSglx, ip, slot, chn_vlt );
+}
+
+
+SGLX_EXPORT bool SGLX_CALL c_sglx_obx_wave_arm(
+    void    *hSglx,
+    int     ip,
+    int     slot,
+    int     trig,
+    bool    loop )
+{
+    return c_sglx_obx_wave_arm( hSglx, ip, slot, trig, loop );
+}
+
+
+SGLX_EXPORT bool SGLX_CALL c_sglx_obx_wave_load(
+    void        *hSglx,
+    int         ip,
+    int         slot,
+    const char  *wave )
+{
+    return sglx_obx_wave_load( hSglx, ip, slot, wave );
+}
+
+
+SGLX_EXPORT bool SGLX_CALL c_sglx_obx_wave_startstop(
+    void    *hSglx,
+    int     ip,
+    int     slot,
+    bool    start )
+{
+    return c_sglx_obx_wave_startstop( hSglx, ip, slot, start );
 }
 
 
