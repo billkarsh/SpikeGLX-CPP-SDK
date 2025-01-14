@@ -765,10 +765,57 @@ SGLX_EXPORT bool SGLX_CALL sglx_ni_DO_set(
 {
     Comm    C;
     char    sbits[32];
-    sprintf( sbits, " %d", bits );
+    sprintf( sbits, " %u", bits );
 
     try {
         return C.doCommand( HS, string("NIDOSET ") + HS->cpp_get_str(lines) + sbits );
+    }
+    CATCH()
+}
+
+
+SGLX_EXPORT bool SGLX_CALL sglx_ni_wave_arm(
+    void                *hSglx,
+    const std::string   &outChan,
+    const std::string   &trigTerm )
+{
+    Comm    C;
+
+    try {
+        return C.doCommand( HS, string("NIWVARM ") + HS->cpp_get_str(outChan) + HS->cpp_get_str(trigTerm) );
+    }
+    CATCH()
+}
+
+
+SGLX_EXPORT bool SGLX_CALL sglx_ni_wave_load(
+    void                *hSglx,
+    const std::string   &outChan,
+    const std::string   &wave,
+    bool                loop )
+{
+    Comm    C;
+    char    sloop[32];
+    sprintf( sloop, " %d", loop );
+
+    try {
+        return C.doCommand( HS, string("NIWVLOAD ") + HS->cpp_get_str(outChan) + HS->cpp_get_str(wave) + sloop );
+    }
+    CATCH()
+}
+
+
+SGLX_EXPORT bool SGLX_CALL sglx_ni_wave_startstop(
+    void                *hSglx,
+    const std::string   &outChan,
+    bool                start )
+{
+    Comm    C;
+    char    sstart[32];
+    sprintf( sstart, " %d", start );
+
+    try {
+        return C.doCommand( HS, string("NIWVSTSP ") + HS->cpp_get_str(outChan) + sstart );
     }
     CATCH()
 }

@@ -542,6 +542,34 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_ni_DO_set(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL c_sglx_ni_wave_arm(
+    void        *hSglx,
+    const char  *outChan,
+    const char  *trigTerm )
+{
+    return sglx_ni_wave_arm( hSglx, outChan, trigTerm );
+}
+
+
+SGLX_EXPORT bool SGLX_CALL c_sglx_ni_wave_load(
+    void        *hSglx,
+    const char  *outChan,
+    const char  *wave,
+    bool        loop )
+{
+    return sglx_ni_wave_load( hSglx, outChan, wave, loop );
+}
+
+
+SGLX_EXPORT bool SGLX_CALL c_sglx_ni_wave_startstop(
+    void        *hSglx,
+    const char  *outChan,
+    bool        start )
+{
+    return sglx_ni_wave_startstop( hSglx, outChan, start );
+}
+
+
 SGLX_EXPORT bool SGLX_CALL c_sglx_obx_AO_set(
     void        *hSglx,
     int         ip,

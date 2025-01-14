@@ -441,6 +441,70 @@ c_sglx_ni_DO_set = sglx.c_sglx_ni_DO_set
 c_sglx_ni_DO_set.restype = c_bool
 c_sglx_ni_DO_set.argtypes = [c_void_p, c_char_p, c_uint]
 
+# General sequence:
+# 1. NI_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+# 2. NI_Wave_Arm       : Set triggering parameters.
+# 3. NI_Wave_StartStop : Start if software trigger, stop when done.
+#
+# Set trigger method.
+# - trigTerm is a string naming any trigger-capable terminal on your
+#   device, e.g., '/dev1/pfi2'. NI-DAQ requires names of terminals to
+#   start with a '/' character. This is indeed different than channel
+#   names which do not start with a slash.
+#   (1) Give a correct terminal string to trigger playback upon
+#       receiving a rising edge at that terminal.
+#   (2) Give any string that does NOT start with a '/' to trigger
+#       playback via the NI_Wave_StartStop command.
+# - Multiple trigger events can NOT be given. For each trigger
+#   event after the first, you must first call NI_Wave_StartStop
+#   AND NI_Wave_Arm to stop and then rearm the task.
+#
+# outChan is a string naming any wave-capable analog output
+# channel on your device, e.g., 'dev1/ao1'.
+# ok = c_sglx_ni_wave_arm( hSglx, outChan, trigTerm )
+#
+c_sglx_ni_wave_arm = sglx.c_sglx_ni_wave_arm
+c_sglx_ni_wave_arm.restype = c_bool
+c_sglx_ni_wave_arm.argtypes = [c_void_p, c_char_p, c_char_p]
+
+# General sequence:
+# 1. NI_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+# 2. NI_Wave_Arm       : Set triggering parameters.
+# 3. NI_Wave_StartStop : Start if software trigger, stop when done.
+#
+# Load a wave descriptor already placed in SpikeGLX/_Waves.
+# - Pass 'mywavename' to this function; no path; no extension.
+# - The playback loop_modes are: {1=loop until stopped, 0=once only}.
+#
+# outChan is a string naming any wave-capable analog output
+# channel on your device, e.g., 'dev1/ao1'.
+# ok = c_sglx_ni_wave_load( hSglx, outChan, wave, loop )
+#
+c_sglx_ni_wave_load = sglx.c_sglx_ni_wave_load
+c_sglx_ni_wave_load.restype = c_bool
+c_sglx_ni_wave_load.argtypes = [c_void_p, c_char_p, c_char_p, c_bool]
+
+# General sequence:
+# 1. NI_Wave_Load      : Load wave from SpikeGLX/_Waves folder.
+# 2. NI_Wave_Arm       : Set triggering parameters.
+# 3. NI_Wave_StartStop : Start if software trigger, stop when done.
+#
+# Start (optionally) or stop wave playback.
+# - If you selected software triggering with NI_Wave_Arm,
+#   then set start_bool=1 to start playback.
+# - In all cases, set start_bool=0 to stop playback.
+# - It is best to stop playback before changing wave parameters.
+# - After playback or if looping mode is interrupted, the voltage
+#   remains at the last output level.
+#
+# outChan is a string naming any wave-capable analog output
+# channel on your device, e.g., 'dev1/ao1'.
+# ok = c_sglx_ni_wave_startstop( hSglx, outChan, start )
+#
+c_sglx_ni_wave_startstop = sglx.c_sglx_ni_wave_startstop
+c_sglx_ni_wave_startstop.restype = c_bool
+c_sglx_ni_wave_startstop.argtypes = [c_void_p, c_char_p, c_bool]
+
 # Set one or more OneBox AO (DAC) channel voltages.
 # - chn_vlt is a string with format: (chan,volts)(chan,volts)...()
 # - The chan values are integer AO indices in range [0,11].
@@ -465,20 +529,22 @@ c_sglx_obx_AO_set.argtypes = [c_void_p, c_int, c_int, c_char_p]
 # 2. OBX_Wave_Arm       : Set triggering parameters.
 # 3. OBX_Wave_StartStop : Start if software trigger, stop when done.
 #
-# Set trigger method, and playback mode.
+# Set trigger method, and playback loop mode.
 # - Trigger values...Playback starts:
 #     -2   : By calling OBX_Wave_StartStop.
 #     -1   : When TTL rising edge sent to SMA1.
 #     0-11 : When TTL rising edge sent to that XA (ADC) channel.
 # - To use an ADC channel, you must name it as an XA channel on
 #   the OBX setup tab of the Acquisition Configuration dialog.
-# - Multiple trigger events can be given without needing to rearm.
-# - The playback modes are: {1=loop until stopped, 0=once only}.
+# - Multiple trigger events (either hardware or software) can be
+#   given without needing to rearm.
+# - The playback loop modes are: {1=loop until stopped, 0=once only}.
 #
 # To reference a OneBox configured as a recording stream
 # set ip to its stream-id; if ip >= 0, slot is ignored.
 # Any selected OneBox can also be referenced by setting
 # ip = -1, and giving its slot index.
+# ok = c_sglx_obx_wave_arm( hSglx, ip, slot, trig, loop )
 #
 c_sglx_obx_wave_arm = sglx.c_sglx_obx_wave_arm
 c_sglx_obx_wave_arm.restype = c_bool
@@ -496,6 +562,7 @@ c_sglx_obx_wave_arm.argtypes = [c_void_p, c_int, c_int, c_int, c_bool]
 # set ip to its stream-id; if ip >= 0, slot is ignored.
 # Any selected OneBox can also be referenced by setting
 # ip = -1, and giving its slot index.
+# ok = c_sglx_obx_wave_load( hSglx, ip, slot, wave )
 #
 c_sglx_obx_wave_load = sglx.c_sglx_obx_wave_load
 c_sglx_obx_wave_load.restype = c_bool
@@ -514,12 +581,14 @@ c_sglx_obx_wave_load.argtypes = [c_void_p, c_int, c_int, c_char_p]
 # - Waves only play at AO (DAC) channel-0.
 # - To use the waveplayer, you must name channel AO-0 on
 #   the OBX setup tab of the Acquisition Configuration dialog.
-# - After playback, the voltage remains at the last programmed level.
+# - After playback or if looping mode is interrupted, the voltage
+#   remains at the last output level.
 #
 # To reference a OneBox configured as a recording stream
 # set ip to its stream-id; if ip >= 0, slot is ignored.
 # Any selected OneBox can also be referenced by setting
 # ip = -1, and giving its slot index.
+# ok = c_sglx_obx_wave_startstop( hSglx, ip, slot, start )
 #
 c_sglx_obx_wave_startstop = sglx.c_sglx_obx_wave_startstop
 c_sglx_obx_wave_startstop.restype = c_bool

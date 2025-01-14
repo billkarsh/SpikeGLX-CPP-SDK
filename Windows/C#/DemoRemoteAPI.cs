@@ -343,17 +343,17 @@ error:
 
                     if (tpts > 1)
                     {
-                        int diff = data[id + (tpts - 1) * nC] - data[id],
+                        int diff  = data[id + (tpts - 1) * nC] - data[id],
                             digOK = 1;
 
                         if (diff > thresh && bits == 0)
                         {
-                            bits = 0xFF;
+                            bits  = 0xFF;
                             digOK = C_Sglx.c_sglx_ni_DO_set(hSglx, line, bits);
                         }
                         else if (diff < -thresh && bits == 0xFF)
                         {
-                            bits = 0;
+                            bits  = 0;
                             digOK = C_Sglx.c_sglx_ni_DO_set(hSglx, line, bits);
                         }
 
