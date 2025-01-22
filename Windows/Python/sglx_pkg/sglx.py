@@ -628,6 +628,14 @@ c_sglx_par2 = sglx.c_sglx_par2
 c_sglx_par2.restype = c_bool
 c_sglx_par2.argtypes = [T_sglx_callback, c_void_p, c_char, c_char_p]
 
+# Pause Graphs window displays.
+# Note: The displays are updated at ~10 Hz.
+# ok = c_sglx_pause_graphs( hSglx, pause )
+#
+c_sglx_pause_graphs = sglx.c_sglx_pause_graphs
+c_sglx_pause_graphs.restype = c_bool
+c_sglx_pause_graphs.argtypes = [c_void_p, c_bool]
+
 # Set anatomy data string with Pinpoint format:
 # [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)(startpos,endpos,R,G,B,rgnname)...()
 #    - probe-id: SpikeGLX logical probe id.

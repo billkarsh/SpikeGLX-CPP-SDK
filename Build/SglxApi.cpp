@@ -980,6 +980,19 @@ SGLX_EXPORT bool SGLX_CALL sglx_par2(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL sglx_pause_graphs( void *hSglx, bool pause )
+{
+    Comm    C;
+    char    cmd[32];
+    sprintf( cmd, "PAUSEGRF %d", pause );
+
+    try {
+        return C.doCommand( HS, cmd );
+    }
+    CATCH()
+}
+
+
 SGLX_EXPORT bool SGLX_CALL sglx_setAnatomy_Pinpoint(
     void                *hSglx,
     const std::string   &shankdat )

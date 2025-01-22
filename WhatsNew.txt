@@ -12,6 +12,7 @@ AS OF 20241215
 - Add sglx_obx_wave_arm.
 - Add sglx_obx_wave_load.
 - Add sglx_obx_wave_startstop.
+- Add sglx_pause_graphs.
 
 ==============
 AS OF 20240129

@@ -650,6 +650,12 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_par2(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL c_sglx_pause_graphs( void *hSglx, bool pause )
+{
+    return sglx_pause_graphs( hSglx, pause );
+}
+
+
 SGLX_EXPORT bool SGLX_CALL c_sglx_setAnatomy_Pinpoint(
     void        *hSglx,
     const char  *shankdat )

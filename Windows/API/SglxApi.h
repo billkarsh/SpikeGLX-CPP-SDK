@@ -770,6 +770,11 @@ SGLX_EXPORT bool SGLX_CALL sglx_par2(
     char                op,
     const std::string   &file );
 
+// Pause Graphs window displays.
+// Note: The displays are updated at ~10 Hz.
+//
+SGLX_EXPORT bool SGLX_CALL sglx_pause_graphs( void *hSglx, bool pause );
+
 // Set anatomy data string with Pinpoint format:
 // [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)(startpos,endpos,R,G,B,rgnname)...()
 //    - probe-id: SpikeGLX logical probe id.

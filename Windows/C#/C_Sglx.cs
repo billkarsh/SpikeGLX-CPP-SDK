@@ -589,6 +589,12 @@ namespace C_Sglx_namespace
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_par2([MarshalAs(UnmanagedType.FunctionPtr)] ProgressCallback callback, IntPtr hSglx, char op, [MarshalAs(UnmanagedType.LPStr)] string file);
 
+// Pause Graphs window displays.
+// Note: The displays are updated at ~10 Hz.
+//
+        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern int c_sglx_pause_graphs(IntPtr hSglx, int pause);
+
 // Set anatomy data string with Pinpoint format:
 // [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)(startpos,endpos,R,G,B,rgnname)...()
 //    - probe-id: SpikeGLX logical probe id.
