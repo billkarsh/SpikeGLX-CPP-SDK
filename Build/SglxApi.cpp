@@ -847,7 +847,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_obx_wave_arm(
 {
     Comm    C;
     char    cmd[32];
-    sprintf( cmd, "OBWVARM %d %d %d %d", ip, slot, trig, loop );
+    sprintf( cmd, "OBXWVARM %d %d %d %d", ip, slot, trig, loop );
 
     try {
         return C.doCommand( HS, cmd );
@@ -864,7 +864,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_obx_wave_load(
 {
     Comm    C;
     char    cmd[32];
-    sprintf( cmd, "OBWVLOAD %d %d ", ip, slot );
+    sprintf( cmd, "OBXWVLOAD %d %d ", ip, slot );
 
     try {
         return C.doCommand( HS, string(cmd) + HS->cpp_get_str(wave) );
@@ -881,7 +881,7 @@ SGLX_EXPORT bool SGLX_CALL sglx_obx_wave_startstop(
 {
     Comm    C;
     char    cmd[32];
-    sprintf( cmd, "OBWVSTSP %d %d %d", ip, slot, start );
+    sprintf( cmd, "OBXWVSTSP %d %d %d", ip, slot, start );
 
     try {
         return C.doCommand( HS, cmd );

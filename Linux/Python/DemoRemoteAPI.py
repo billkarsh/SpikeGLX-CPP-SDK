@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sglx as sglx
+from sglx_pkg import sglx as sglx
 from ctypes import byref, POINTER, c_int, c_short, c_bool, c_char_p
 
 # Edit the server address/port here

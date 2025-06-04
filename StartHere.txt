@@ -1,0 +1,23 @@
+For linux Users
+===============
+1. Go into the Linux/ folder.
+2. Look at the Contents and GettingStarted docs there.
+3. You will have to build the library using Linux/API/make-install.sh.
+4. Go into the language subfolder of your choice and follow its README.
+
+For Windows Users
+=================
+1. Go into the Windows/ folder.
+2. Look at the Contents and GettingStarted docs there.
+3. There is nothing to build.
+4. Go into the language subfolder of your choice and follow the README or the doc for building a demo Visual Studio project.
+
+For All Users
+=============
+I've recently added scripts demoing how to drive the wavePlayer:
++ Scripts are: {wp_soft_start, wp_trig_start}.
++ You'll have to edit the SpikeGLX network addr, as with the DemoRemoteAPI script.
++ At the SDK top level, JWAVE is an example wave you can try.
+
+There are additional docs for all users in General Docs/.
+

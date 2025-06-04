@@ -4,7 +4,7 @@ from sys import version_info
 from ctypes import *
 
 if version_info >= (3,8):
-    sglx = CDLL( "SglxApi.dll", winmode=0 )
+    sglx = CDLL( "SglxApi.dll", winmode=0x1000 )
 else:
     sglx = CDLL( "SglxApi.dll" )
 

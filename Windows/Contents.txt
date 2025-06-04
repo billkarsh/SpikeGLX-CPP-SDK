@@ -39,6 +39,10 @@ Tools to help build an ANSI C client:
     + CreateVisualStudioProject.txt
     + DemoRemoteAPI.c
     + DemoRemoteAPI.h
+    + wp_soft_start.c
+    + wp_soft_start.h
+    + wp_trig_start.c
+    + wp_trig_start.h
 
 C# folder
 =========
@@ -47,6 +51,7 @@ Tools to help build C# client:
     + CreateVisualStudioProject.txt
     + C_Sglx.cs
     + DemoRemoteAPI.cs
+    + WavePlay.cs
 
 CPP folder
 ==========
@@ -55,25 +60,37 @@ Tools to help build C++ client:
     + CreateVisualStudioProject.txt
     + DemoRemoteAPI.cpp
     + DemoRemoteAPI.h
+    + wp_soft_start.cpp
+    + wp_soft_start.h
+    + wp_trig_start.cpp
+    + wp_trig_start.h
 
 Python folder
 =============
 Tools to help build Python client:
 
-    sglx_pkg:
+    + sglx_pkg:
         + __init__.py
         + sglx.py
-        + sglx_demo.py  # equivalent to DemoRemoteAPI
+    + DemoRemoteAPI.py
+    + wp_soft_start.py
+    + wp_trig_start.py
 
 IMPORTANT: Copy the 4 DLLs from the API folder to your sglx_pkg folder.
 
+DeepPyProject
+=============
+Help with complex Python project file organization.
+
+JWave folder
+============
+This is a waveform you can play with the wp_XXX scripts. Copy these files into the _Waves folder at the top level of your SpikeGLX folder.
+
 Help docs
 =========
-
 - Contents.txt
 - GettingStarted.txt
-- Help.txt
-- LICENSE.txt
-- WhatsNew.txt
+- General Docs/Help.txt
+- General Docs/WhatsNew.txt
 
 

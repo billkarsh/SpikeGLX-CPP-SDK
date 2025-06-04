@@ -1,4 +1,14 @@
 ==============
+AS OF 20250325
+==============
+
+- Fix sglx_ni_DO_set.
+- Fix waveplayer calls.
+- Add waveplayer example scripts and waveform.
+- Improve Python project instructions.
+- Add DeepPyProject Python demo.
+
+==============
 AS OF 20241215
 ==============
 

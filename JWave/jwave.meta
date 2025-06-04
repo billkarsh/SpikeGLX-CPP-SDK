@@ -1,0 +1,6 @@
+[WaveMeta]
+sample_frequency_Hz_dbl=25000
+wave_Vmax_dbl=2.5
+device_Vmax_dbl=5
+data_type_txt_i16_f32=txt
+num_samples_i32=0

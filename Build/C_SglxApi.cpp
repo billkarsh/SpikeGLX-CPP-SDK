@@ -587,7 +587,7 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_obx_wave_arm(
     int     trig,
     bool    loop )
 {
-    return c_sglx_obx_wave_arm( hSglx, ip, slot, trig, loop );
+    return sglx_obx_wave_arm( hSglx, ip, slot, trig, loop );
 }
 
 
@@ -607,7 +607,7 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_obx_wave_startstop(
     int     slot,
     bool    start )
 {
-    return c_sglx_obx_wave_startstop( hSglx, ip, slot, start );
+    return sglx_obx_wave_startstop( hSglx, ip, slot, start );
 }
 
 
