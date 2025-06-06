@@ -27,13 +27,11 @@ Tools to help build an ANSI C client:
 
     + README.txt
     + make.sh
-    + DemoRemoteAPI.c
-    + DemoRemoteAPI.h
+    + DemoRemoteAPI.c, .h
     + main.c
-    + wp_soft_start.c
-    + wp_soft_start.h
-    + wp_trig_start.c
-    + wp_trig_start.h
+    + wp_ni_soft_start.c, .h
+    + wp_soft_start.c, .h
+    + wp_trig_start.c, .h
 
 CPP folder
 ==========
@@ -41,13 +39,11 @@ Tools to help build C++ client:
 
     + README.txt
     + make.sh
-    + DemoRemoteAPI.cpp
-    + DemoRemoteAPI.h
+    + DemoRemoteAPI.cpp, .h
     + main.cpp
-    + wp_soft_start.cpp
-    + wp_soft_start.h
-    + wp_trig_start.cpp
-    + wp_trig_start.h
+    + wp_ni_soft_start.cpp, .h
+    + wp_soft_start.cpp, .h
+    + wp_trig_start.cpp, .h
 
 Python folder
 =============
@@ -58,6 +54,7 @@ Tools to help build Python client:
         + __init__.py
         + sglx.py
     + DemoRemoteAPI.py
+    + wp_ni_soft_start.py
     + wp_soft_start.py
     + wp_trig_start.py
 

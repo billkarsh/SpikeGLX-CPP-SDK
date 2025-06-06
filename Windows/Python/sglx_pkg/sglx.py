@@ -16,7 +16,7 @@ else:
 # The returned handle can then be passed to any of the API functions.
 # When done, client calls c_sglx_close() and c_sglx_destroyHandle().
 #
-# Almost all functions return either true=1=SUCCESS, or false=0=FAIL.
+# Almost all functions return either True=SUCCESS, or False=FAIL.
 # Get the reason for the most recent failure with c_sglx_getError().
 # ------------------------
 
@@ -474,7 +474,7 @@ c_sglx_ni_wave_arm.argtypes = [c_void_p, c_char_p, c_char_p]
 #
 # Load a wave descriptor already placed in SpikeGLX/_Waves.
 # - Pass 'mywavename' to this function; no path; no extension.
-# - The playback loop_modes are: {1=loop until stopped, 0=once only}.
+# - The playback loop_modes are: {True=loop until stopped, False=once only}.
 #
 # outChan is a string naming any wave-capable analog output
 # channel on your device, e.g., 'dev1/ao1'.
@@ -491,8 +491,8 @@ c_sglx_ni_wave_load.argtypes = [c_void_p, c_char_p, c_char_p, c_bool]
 #
 # Start (optionally) or stop wave playback.
 # - If you selected software triggering with NI_Wave_Arm,
-#   then set start_bool=1 to start playback.
-# - In all cases, set start_bool=0 to stop playback.
+#   then set start_bool=True to start playback.
+# - In all cases, set start_bool=False to stop playback.
 # - It is best to stop playback before changing wave parameters.
 # - After playback or if looping mode is interrupted, the voltage
 #   remains at the last output level.
@@ -538,7 +538,7 @@ c_sglx_obx_AO_set.argtypes = [c_void_p, c_int, c_int, c_char_p]
 #   the OBX setup tab of the Acquisition Configuration dialog.
 # - Multiple trigger events (either hardware or software) can be
 #   given without needing to rearm.
-# - The playback loop modes are: {1=loop until stopped, 0=once only}.
+# - The playback loop modes are: {True=loop until stopped, False=once only}.
 #
 # To reference a OneBox configured as a recording stream
 # set ip to its stream-id; if ip >= 0, slot is ignored.
@@ -575,8 +575,8 @@ c_sglx_obx_wave_load.argtypes = [c_void_p, c_int, c_int, c_char_p]
 #
 # Start (optionally) or stop wave playback.
 # - If you selected software triggering with OBX_Wave_Arm,
-#   then set start_bool=1 to start playback.
-# - In all cases, set start_bool=0 to stop playback.
+#   then set start_bool=True to start playback.
+# - In all cases, set start_bool=False to stop playback.
 # - It is best to stop playback before changing wave parameters.
 # - Waves only play at AO (DAC) channel-0.
 # - To use the waveplayer, you must name channel AO-0 on
@@ -608,7 +608,7 @@ c_sglx_opto_emit.argtypes = [c_void_p, c_int, c_int, c_int]
 # ip:    imec probe index.
 # color: {0=blue, 1=red}.
 #
-# If successful, nval is the 14. See c_sglx_getdbl().
+# If successful, nval is 14. See c_sglx_getdbl().
 # ok = c_sglx_opto_getAttenuations( byref(nval), hSglx, ip, color )
 #
 c_sglx_opto_getAttenuations = sglx.c_sglx_opto_getAttenuations
@@ -854,7 +854,7 @@ c_sglx_triggerGT.argtypes = [c_void_p, c_int, c_int]
 # Absolute path/filenames are also supported. Status/progress
 # lines are reported to optional callback.
 #
-# Return true if verified (and no errors).
+# Return True if verified (and no errors).
 # ok = c_sglx_verifySha1( callback, hSglx, filename )
 #
 c_sglx_verifySha1 = sglx.c_sglx_verifySha1

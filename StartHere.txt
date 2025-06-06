@@ -15,7 +15,7 @@ For Windows Users
 For All Users
 =============
 I've recently added scripts demoing how to drive the wavePlayer:
-+ Scripts are: {wp_soft_start, wp_trig_start}.
++ Scripts are: {wp_XXX}.
 + You'll have to edit the SpikeGLX network addr, as with the DemoRemoteAPI script.
 + At the SDK top level, JWAVE is an example wave you can try.
 

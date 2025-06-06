@@ -11,6 +11,65 @@ namespace WavePlay_namespace {
         static int port = 4142;
 
 
+        // Plays wave 'jwave' at NI channel AO-0.
+        // Playback is triggered by software command.
+        //
+        public static void wp_ni_soft_start()
+        {
+            // Handle to SpikeGLX
+            IntPtr hSglx = C_Sglx.c_sglx_createHandle();
+            int ok = C_Sglx.c_sglx_connect(hSglx, addr, port);
+
+            if (ok == 1)
+            {
+                // Load the wave plan, select infinite looping
+                string wave_name = "jwave";
+                string outChan   = "PXI1Slot6_2/ao0";
+                int    looping   = 1;
+                ok = C_Sglx.c_sglx_ni_wave_load(hSglx, outChan, wave_name, looping);
+                if (ok == 0)
+                    goto error;
+
+                // Select software triggering
+                string trigTerm = "software";
+                ok = C_Sglx.c_sglx_ni_wave_arm(hSglx, outChan, trigTerm);
+                if (ok == 0)
+                    goto error;
+
+                // Start playback now
+                int start = 1;
+                ok = C_Sglx.c_sglx_ni_wave_startstop(hSglx, outChan, start);
+                if (ok == 0)
+                    goto error;
+
+                // This section demonstrates a method to capture your
+                // wave plan in action. The best sleep parameters will
+                // depend upon the duration of your wave plan and how
+                // fast your SpikeGLX graphs are sweeping
+                //
+                // Let this play for 1 second
+                // Then sleep the SpikeGLX Graphs Window for 2 seconds
+                // Then resume Graphs for 5 seconds
+                Thread.Sleep(1000);
+                C_Sglx.c_sglx_pause_graphs(hSglx, 1);
+                Thread.Sleep(2000);
+                C_Sglx.c_sglx_pause_graphs(hSglx, 0);
+                Thread.Sleep(5000);
+
+                // Stop playback
+                start = 0;
+                ok = C_Sglx.c_sglx_ni_wave_startstop(hSglx, outChan, start);
+            }
+
+error:
+            if (ok == 0)
+                Console.WriteLine("error [{0}]\n", C_Sglx.cs_sglx_getError(hSglx));
+
+            C_Sglx.c_sglx_close(hSglx);
+            C_Sglx.c_sglx_destroyHandle(hSglx);
+        }
+
+
         // Plays wave 'jwave' at OneBox channel AO-0.
         // Playback is triggered by software command.
         //

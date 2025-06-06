@@ -1,6 +1,4 @@
 
-//#include "stdafx.h" // enable if using Visual Studio precompiled headers
-
 #include "C_SglxApi.h"
 #include <stdio.h>
 #include <unistd.h>

@@ -782,7 +782,10 @@ SGLX_EXPORT bool SGLX_CALL sglx_ni_wave_arm(
     Comm    C;
 
     try {
-        return C.doCommand( HS, string("NIWVARM ") + HS->cpp_get_str(outChan) + HS->cpp_get_str(trigTerm) );
+        return C.doCommand( HS, string("NIWVARM ")
+                + HS->cpp_get_str(outChan)
+                + string(" ")
+                + HS->cpp_get_str(trigTerm) );
     }
     CATCH()
 }
@@ -799,7 +802,11 @@ SGLX_EXPORT bool SGLX_CALL sglx_ni_wave_load(
     sprintf( sloop, " %d", loop );
 
     try {
-        return C.doCommand( HS, string("NIWVLOAD ") + HS->cpp_get_str(outChan) + HS->cpp_get_str(wave) + sloop );
+        return C.doCommand( HS, string("NIWVLOAD ")
+                + HS->cpp_get_str(outChan)
+                + string(" ")
+                + HS->cpp_get_str(wave)
+                + sloop );
     }
     CATCH()
 }

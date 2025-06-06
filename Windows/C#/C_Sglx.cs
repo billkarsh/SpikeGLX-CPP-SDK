@@ -573,7 +573,7 @@ namespace C_Sglx_namespace
 // ip:    imec probe index.
 // color: {0=blue, 1=red}.
 //
-// If successful, nval is the 14. See c_sglx_getdbl().
+// If successful, nval is 14. See c_sglx_getdbl().
 //
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_opto_getAttenuations(out int nval, IntPtr hSglx, int ip, int color);
