@@ -227,6 +227,12 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_getImecChanGains(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL c_sglx_getLastGT( int *g, int *t, void *hSglx )
+{
+    return sglx_getLastGT( *g, *t, hSglx );
+}
+
+
 SGLX_EXPORT bool SGLX_CALL c_sglx_getNIShankMap( int *nval, void *hSglx )
 {
     HS->xvstr.clear();

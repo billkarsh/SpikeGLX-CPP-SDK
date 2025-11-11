@@ -370,6 +370,11 @@ SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
     int     ip,
     int     chan );
 
+// Get most recently used {g,t} indices.
+// Returns {-1,-1} if no files written yet.
+//
+SGLX_EXPORT bool SGLX_CALL sglx_getLastGT( int &g, int &t, void *hSglx );
+
 // Get the most recently used run parameters.
 // These are (key,value) pairs.
 //

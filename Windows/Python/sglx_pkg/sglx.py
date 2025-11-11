@@ -207,6 +207,14 @@ c_sglx_getImecChanGains = sglx.c_sglx_getImecChanGains
 c_sglx_getImecChanGains.restype = c_bool
 c_sglx_getImecChanGains.argtypes = [POINTER(c_double), POINTER(c_double), c_void_p, c_int, c_int]
 
+# Get most recently used {g,t} indices.
+# Returns {-1,-1} if no files written yet.
+# ok = c_sglx_getLastGT( byref(g), byref(t), hSglx )
+#
+c_sglx_getLastGT = sglx.c_sglx_getLastGT
+c_sglx_getLastGT.restype = c_bool
+c_sglx_getLastGT.argtypes = [POINTER(c_int), POINTER(c_int), c_void_p]
+
 # Get shankMap for NI stream. If successful the data are returned
 # as nval strings. The first string is the header: "ns nc ns" giving
 # the shank's maximum count of {shanks, cols, rows}. The remaining

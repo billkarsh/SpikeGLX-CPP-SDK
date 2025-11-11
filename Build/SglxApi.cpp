@@ -262,6 +262,27 @@ SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL sglx_getLastGT( int &g, int &t, void *hSglx )
+{
+    Comm    C;
+    string  s;
+
+    try {
+        g = -1;
+        t = -1;
+        C.do1LineQuery( s, HS, "GETLASTGT", true );
+
+        if( 2 == sscanf( s.c_str(), "%d %d", &g, &t ) )
+            return true;
+        else {
+            HS->cpp_set_str( HS->err, "sglx_getLastGT: Garbled gt string." );
+            return false;
+        }
+    }
+    CATCH()
+}
+
+
 SGLX_EXPORT bool SGLX_CALL sglx_getParams(
     T_sglx_get_strs     &kv,
     void                *hSglx )

@@ -231,6 +231,12 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_getImecChanGains(
     int     chan );
 
 /* ------------
+    Get most recently used {g,t} indices.
+    Returns {-1,-1} if no files written yet.
+*/
+SGLX_EXPORT bool SGLX_CALL c_sglx_getLastGT( int *g, int *t, void *hSglx );
+
+/* ------------
     Get shankMap for NI stream. If successful the data are returned
     as nval strings. The first string is the header: "ns nc ns" giving
     the shank's maximum count of {shanks, cols, rows}. The remaining
