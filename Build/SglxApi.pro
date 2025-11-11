@@ -73,7 +73,7 @@ unix {
 QMAKE_TARGET_COMPANY = Bill Karsh
 QMAKE_TARGET_PRODUCT = SglxApi
 QMAKE_TARGET_DESCRIPTION = SpikeGLX Com Link
-QMAKE_TARGET_COPYRIGHT = (c) 2024, Bill Karsh, All rights reserved
-VERSION = 1.5.2
+QMAKE_TARGET_COPYRIGHT = (c) 2025, Bill Karsh, All rights reserved
+VERSION = 1.5.3
 
 
