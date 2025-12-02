@@ -6,10 +6,7 @@
         Set 'Platform Target' to 'x64'.
 3. In VS Main Menubar, select configuration options: 'Release', 'Any CPU'.
 4. Build the solution (Build/Build Solution), which creates folder: Demo/Demo/bin/Release, and Demo.exe.
-5. Into that Release folder place copies of:
-    API/libgcc_s_seh-1.dll
-    API/libstdc++-6.dll
-    API/libwinpthread-1.dll
+5. Into that Release folder place copy of:
     API/SglxApi.dll
 6. Right-click on the Demo project in the Solution window and select Add/Existing:
     C#/C_Sglx.cs

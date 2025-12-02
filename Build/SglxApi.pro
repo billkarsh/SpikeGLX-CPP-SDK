@@ -57,8 +57,11 @@ defineReplace(copyToDir) {
 }
 
 win32 {
-    CONFIG  += skip_target_version_ext
-    LIBS    += -lWs2_32
+    CONFIG          += skip_target_version_ext
+    LIBS            += -lWs2_32
+    QMAKE_CXXFLAGS  += -ffunction-sections -fdata-sections -flto
+    QMAKE_LFLAGS    += -Wl,--no-whole-archive -Wl,--gc-sections -flto
+    QMAKE_LFLAGS    += -static -static-libgcc -static-libstdc++
 }
 
 unix {
@@ -67,8 +70,8 @@ unix {
 #    INSTALLS += target
 }
 
-    QMAKE_POST_LINK += $$copyToDir( C_SglxApi.h SglxApi.h SglxCppClient.h SglxCppClient.cpp, $${DESTDIR} )
-
+QMAKE_POST_LINK += $$copyToDir( C_SglxApi.h SglxApi.h SglxCppClient.h SglxCppClient.cpp, $${DESTDIR} )
+QMAKE_POST_LINK += strip --strip-unneeded $${DESTDIR}/$${TARGET}.dll
 
 QMAKE_TARGET_COMPANY = Bill Karsh
 QMAKE_TARGET_PRODUCT = SglxApi

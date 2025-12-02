@@ -1,10 +1,6 @@
 
 1. There is nothing to build.
-2. Copy these DLLs from the API to the sglx_pkg folder:
-    + libgcc_s_seh-1.dll
-    + libstdc++-6.dll
-    + libwinpthread-1.dll
-    + SglxApi.dll
+2. Copy SglxApi.dll from the API to the sglx_pkg folder.
 3. Edit DemoRemoteAPI.py to set variable: 'sglx_addr.'
 3. Start SpikeGLX.
 4. Test out functions in __main__ of DemoRemoteAPI.py.

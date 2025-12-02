@@ -8,9 +8,6 @@ API folder
 API contains a complete prebuilt set of API components:
 
 Always needed for any exe:
-    + libgcc_s_seh-1.dll    // place in client exe directory
-    + libstdc++-6.dll       // place in client exe directory
-    + libwinpthread-1.dll   // place in client exe directory
     + SglxApi.dll           // place in client exe directory
 
 Some of these needed depending upon language:

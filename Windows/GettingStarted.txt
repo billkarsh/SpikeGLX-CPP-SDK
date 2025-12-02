@@ -27,13 +27,9 @@ Additional components, to assist binding to C and to demonstrate how to call the
 
 1. Create the desired kind of project. We provide steps to do that in the language-specific folders.
 
-2. Copy the DLLs from API to your target application (runtime) directory:
-- libgcc_s_seh-1.dll
-- libstdc++-6.dll
-- libwinpthread-1.dll
-- SglxApi.dll
+2. Copy SglxApi.dll from API to your target application (runtime) directory.
 
-Note: For Python (no exe), copy the DLLs to the sglx_pkg folder.
+Note: For Python (no exe), copy SglxApi.dll to the sglx_pkg folder.
 
 3. Copy the project components from API to your project directories according to that language's needs.
 A C++ project typcally needs:

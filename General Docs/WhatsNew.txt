@@ -3,6 +3,7 @@ AS OF 20250930
 ==============
 
 - Add sglx_getLastGT.
+- Statically link {gcc, stdc++, winpthread}.
 
 ==============
 AS OF 20250325
