@@ -44,6 +44,15 @@ sglx_destroyHandle( hSglx );            // release memory resources
 The two integer values (js, ip) select a data stream.
 js: stream type: {0=nidq, 1=obx, 2=imec-probe}.
 ip: substream:   {0=nidq (if js=0), 0+=which OneBox or imec probe}.
+
+If you enable filtered IM stream buffers (on IM Setup tab), you can
+retrieve those data using js=-2 in either the fetch or fetchLatest
+calls. Although the data fetched are filtered, the js=2 and js=-2
+stream counterparts have identical characteristics: SN, channels,
+sample rate, sample count, and everything else. Therefore, all calls
+except fetch internally replace js=-2 with js=2, which allows you to
+pass js=-2 to any call without triggering an error.
+
 Examples (js, ip):
 (0, 0) = nidq.	// for nidq, ip is arbitrary but zero by convention
 (1, 4) = obx4.

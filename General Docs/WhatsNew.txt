@@ -3,6 +3,7 @@ AS OF 20251218
 ==============
 
 - Permit js=-2 for any stream operation.
+- Add sglx_getProbeAddrs.
 
 ==============
 AS OF 20250930

@@ -272,8 +272,18 @@ c_sglx_getParamsOneBox = sglx.c_sglx_getParamsOneBox
 c_sglx_getParamsOneBox.restype = c_bool
 c_sglx_getParamsOneBox.argtypes = [POINTER(c_int), c_void_p, c_int, c_int]
 
-# Get string with format:
-# (probeID,nShanks,partNumber)()...
+# Get string with format: (probeID,slot,port,dock)...
+# - A parenthesized entry for each selected probe.
+# - probeID: zero-based integer assigned by 'Detect'.
+# - {slot,port,dock}: where probe is plugged in.
+# - If no probes, return '()'.
+# ok = c_sglx_getProbeAddrs( byref(list), hSglx )
+#
+c_sglx_getProbeAddrs = sglx.c_sglx_getProbeAddrs
+c_sglx_getProbeAddrs.restype = c_bool
+c_sglx_getProbeAddrs.argtypes = [POINTER(c_char_p), c_void_p]
+
+# Get string with format: (probeID,nShanks,partNumber)...
 # - A parenthesized entry for each selected probe.
 # - probeID: zero-based integer.
 # - nShanks: integer {1,4}.
@@ -514,7 +524,7 @@ c_sglx_ni_wave_startstop.restype = c_bool
 c_sglx_ni_wave_startstop.argtypes = [c_void_p, c_char_p, c_bool]
 
 # Set one or more OneBox AO (DAC) channel voltages.
-# - chn_vlt is a string with format: (chan,volts)(chan,volts)...()
+# - chn_vlt is a string with format: (chan,volts)...(chan,volts)
 # - The chan values are integer AO indices in range [0,11].
 # - You can only use AO channels already listed on the OBX setup tab.
 # - Voltages are double values in range [-5.0,5.0] V.
@@ -645,7 +655,7 @@ c_sglx_pause_graphs.restype = c_bool
 c_sglx_pause_graphs.argtypes = [c_void_p, c_bool]
 
 # Set anatomy data string with Pinpoint format:
-# [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)(startpos,endpos,R,G,B,rgnname)...()
+# [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)...(startpos,endpos,R,G,B,rgnname)
 #    - probe-id: SpikeGLX logical probe id.
 #    - shank-id: [0..n-shanks].
 #    - startpos: region start in microns from tip.

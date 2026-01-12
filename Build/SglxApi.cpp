@@ -342,6 +342,17 @@ SGLX_EXPORT bool SGLX_CALL sglx_getParamsOneBox(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL sglx_getProbeAddrs( std::string &list, void *hSglx )
+{
+    Comm    C;
+
+    try {
+        return C.do1LineQuery( list, HS, "GETPROBEADDRS", false );
+    }
+    CATCH()
+}
+
+
 SGLX_EXPORT bool SGLX_CALL sglx_getProbeList( std::string &list, void *hSglx )
 {
     Comm    C;

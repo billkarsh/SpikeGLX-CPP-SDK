@@ -267,8 +267,23 @@ namespace C_Sglx_namespace
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_getParamsOneBox(out int nval, IntPtr hSglx, int ip, int slot);
 
-// Get string with format:
-// (probeID,nShanks,partNumber)()...
+// Get string with format: (probeID,slot,port,dock)...
+// - A parenthesized entry for each selected probe.
+// - probeID: zero-based integer assigned by 'Detect'.
+// - {slot,port,dock}: where probe is plugged in.
+// - If no probes, return '()'.
+//
+        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        static extern int c_sglx_getProbeAddrs(out IntPtr intPtr, IntPtr hSglx);
+        public static int c_sglx_getProbeAddrs(out string list, IntPtr hSglx)
+        {
+            IntPtr  intPtr;
+            int     ret = c_sglx_getProbeAddrs(out intPtr, hSglx);
+            list = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(intPtr);
+            return ret;
+        }
+
+// Get string with format: (probeID,nShanks,partNumber)...
 // - A parenthesized entry for each selected probe.
 // - probeID: zero-based integer.
 // - nShanks: integer {1,4}.
@@ -487,7 +502,7 @@ namespace C_Sglx_namespace
         public static extern int c_sglx_ni_wave_startstop(IntPtr hSglx, [MarshalAs(UnmanagedType.LPStr)] string outChan, int start);
 
 // Set one or more OneBox AO (DAC) channel voltages.
-// - chn_vlt is a string with format: (chan,volts)(chan,volts)...()
+// - chn_vlt is a string with format: (chan,volts)...(chan,volts)
 // - The chan values are integer AO indices in range [0,11].
 // - You can only use AO channels already listed on the OBX setup tab.
 // - Voltages are double values in range [-5.0,5.0] V.
@@ -602,7 +617,7 @@ namespace C_Sglx_namespace
         public static extern int c_sglx_pause_graphs(IntPtr hSglx, int pause);
 
 // Set anatomy data string with Pinpoint format:
-// [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)(startpos,endpos,R,G,B,rgnname)...()
+// [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)...(startpos,endpos,R,G,B,rgnname)
 //    - probe-id: SpikeGLX logical probe id.
 //    - shank-id: [0..n-shanks].
 //    - startpos: region start in microns from tip.

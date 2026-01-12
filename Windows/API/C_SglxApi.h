@@ -291,8 +291,16 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_getParamsOneBox(
     int     slot );
 
 /* ------------
-    Get string with format:
-    (probeID,nShanks,partNumber)()...
+    Get string with format: (probeID,slot,port,dock)...
+    - A parenthesized entry for each selected probe.
+    - probeID: zero-based integer assigned by 'Detect'.
+    - {slot,port,dock}: where probe is plugged in.
+    - If no probes, return '()'.
+*/
+SGLX_EXPORT bool SGLX_CALL c_sglx_getProbeAddrs( const char **list, void *hSglx );
+
+/* ------------
+    Get string with format: (probeID,nShanks,partNumber)...
     - A parenthesized entry for each selected probe.
     - probeID: zero-based integer.
     - nShanks: integer {1,4}.
@@ -544,7 +552,7 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_ni_wave_startstop(
 
 /* ------------
     Set one or more OneBox AO (DAC) channel voltages.
-    - chn_vlt is a string with format: (chan,volts)(chan,volts)...()
+    - chn_vlt is a string with format: (chan,volts)...(chan,volts)
     - The chan values are integer AO indices in range [0,11].
     - You can only use AO channels already listed on the OBX setup tab.
     - Voltages are double values in range [-5.0,5.0] V.
@@ -688,7 +696,7 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_pause_graphs( void *hSglx, bool pause );
 
 /* ------------
     Set anatomy data string with Pinpoint format:
-    [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)(startpos,endpos,R,G,B,rgnname)...()
+    [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)...(startpos,endpos,R,G,B,rgnname)
        - probe-id: SpikeGLX logical probe id.
        - shank-id: [0..n-shanks].
        - startpos: region start in microns from tip.

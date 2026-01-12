@@ -331,6 +331,20 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_getParamsOneBox(
 }
 
 
+SGLX_EXPORT bool SGLX_CALL c_sglx_getProbeAddrs( const char **list, void *hSglx )
+{
+    HS->xstr.clear();
+    *list = HS->xstr.c_str();
+
+    if( sglx_getProbeAddrs( HS->xstr, hSglx ) ) {
+        *list = HS->xstr.c_str();
+        return true;
+    }
+
+    return false;
+}
+
+
 SGLX_EXPORT bool SGLX_CALL c_sglx_getProbeList( const char **list, void *hSglx )
 {
     HS->xstr.clear();
