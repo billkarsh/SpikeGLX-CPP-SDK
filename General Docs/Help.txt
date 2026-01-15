@@ -1,5 +1,5 @@
 ========
-SYNOPSIS
+Synopsis
 ========
 
 The SpikeGLX API accesses the SpikeGLX program via TCP/IP. On top of that, our message exchange protocol implements acknowledgement, validation and error reporting. SpikeGLX.exe and the API client can run on the same Windows machine or across a network.
@@ -17,7 +17,7 @@ A connection handle is weakly stateful: merely keeping a handle to a network soc
 The API should support multithreaded clients, as long as each thread or subprocess is using its own connection handle.
 
 ==========================================
-C++ EXAMPLES (similar for other languages)
+C++ Examples (similar for other languages)
 ==========================================
 
 void *hSglx = sglx_createHandle_std();  // create a connection handle
@@ -57,38 +57,55 @@ Examples (js, ip):
 (0, 0) = nidq.	// for nidq, ip is arbitrary but zero by convention
 (1, 4) = obx4.
 (2, 7) = imec7.
-Note: ip has range [0..np-1], where, np is queried using GetStreamNP().
+Note: ip has range [0..np-1], where, np is queried using getStreamNP().
 
-=======================
-GetParams and SetParams
-=======================
+===================
+Validate Parameters
+===================
 
-Manual Pre-validation
-=====================
+Validation entails applying self-consistency checks to the totality of settings (parameters) that configure the currently selected hardware.
 
-You'll find that several of the API functions to get or set run parameters complain if you haven't validated any parameters yet. Manual validation is something you need to do only once per launch of the SpikeGLX application, not once per run. To validate parameters, visit the Configure dialog in SpikeGLX and make choices for your experiment, then click either 'Run' or 'Verify|Save'. Either of these buttons apply a battery of self-consistency checks to your choices. The most recent set of Configuration settings that have passed all the sanity checks are saved in:
+You'll find that the majority of API functions by necessity modify settings, so will complain if you haven't done a validation yet. An initial validation needs to be done once per launch of the SpikeGLX application. Thereafter, it is done inherently by the setParamsXXX functions and others as needed. The initial validation can be done two ways:
+
+Using the GUI
+=============
+1. Open the 'Configure' dialog in SpikeGLX (Ctrl+N).
+2. Use the 'Enable' checkboxes on the 'Devices' tab to select hardware, then 'Detect'.
+3. Optionally, visit the other tabs and review or edit choices for your experiment.
+4. Click either 'Run' or 'Verify|Save'.
+
+Either button performs a complete validation check, and if successful, all the settings in the dialog are saved as the current working set.
+
+The 'Detect' operation assigns logical-ip numbers to each selected probe and OneBox stream. These are shown in the 'Probe Table'. The API commands to get or set parameters make reference to these ip values, so take note of which is which.
+
+Using SelectDevices
+===================
+1. Call SelectDevices with a devstring parameter that specifies which hardware to enable according to physical(slot,port,dock) addresses.
+
+The SelectDevices function:
+- Opens the 'Configure' dialog.
+- Checks boxes according to the devstring parameter.
+- Clicks 'Detect', and if successful...
+- Clicks 'Verify|Save' which validates and saves a current working set.
+
+You'll still need to know the logical-ip values for the selections:
+2. Call getProbeAddrs and getOneBoxAddrs get logical-to-physical address mappings.
+
+==================
+Explore Parameters
+==================
+
+You can learn what parameters are available by using the getXXX calls. You can also look at their disk files, which are in a few locations:
 
 - 'SpikeGLX/_Configs/daq.ini'
 - 'SpikeGLX/_Calibration/imec_probe_settings.ini'
 - 'SpikeGLX/_Calibration/imec_onebox_settings.ini'.
 
-The above ini files are used to initialize the Configure dialog each time you open it. Open the ini files in a text editor. You'll see several subgroups of settings. This is the best way to see the exact spelling, case, and value type of the items you can read and write via the API. Examples of accessing the subgroups:
+Open the ini files in a text editor. You'll see several subgroups of settings. This is a good way to see the exact spelling, case, and value type of the items you can read and write via the API. Examples of accessing the subgroups:
 
-- Group [DAQSettings]:                GetParams()
-- Group [DAQ_Imec_All]:               GetParamsImecCommon()
-- Group [SerialNumberToProbe]/SNjjj:  GetParamsImecProbe()
-- Group [SerialNumberToOneBox]/SNjjj: GetParamsOneBox()
-
-Generally, follow this workflow:
-
-(1) Launch SpikeGLX and make sure its Command Server is listening (you'll see a message to that effect in the Console/Log window).
-
-(2) Open the Configure dialog to elect which hardware streams you want to run.
-
-(3) Click 'Detect' and then 'Verify|Save'.
-
-Now you are ready to run from a remote application.
-
-(4) Typically you will need to adjust just a few settings from within your script.
+- Group [DAQSettings]:                getParams()
+- Group [DAQ_Imec_All]:               getParamsImecCommon()
+- Group [SerialNumberToProbe]/SNjjj:  getParamsImecProbe()
+- Group [SerialNumberToOneBox]/SNjjj: getParamsOneBox()
 
 

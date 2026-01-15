@@ -264,6 +264,20 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_getNIShankMap( int *nval, void *hSglx )
 }
 
 
+SGLX_EXPORT bool SGLX_CALL c_sglx_getOneBoxAddrs( const char **list, void *hSglx )
+{
+    HS->xstr.clear();
+    *list = HS->xstr.c_str();
+
+    if( sglx_getOneBoxAddrs( HS->xstr, hSglx ) ) {
+        *list = HS->xstr.c_str();
+        return true;
+    }
+
+    return false;
+}
+
+
 SGLX_EXPORT bool SGLX_CALL c_sglx_getParams( int *nval, void *hSglx )
 {
     *nval = 0;
@@ -673,6 +687,15 @@ SGLX_EXPORT bool SGLX_CALL c_sglx_par2(
 SGLX_EXPORT bool SGLX_CALL c_sglx_pause_graphs( void *hSglx, bool pause )
 {
     return sglx_pause_graphs( hSglx, pause );
+}
+
+
+SGLX_EXPORT bool SGLX_CALL c_sglx_selectDevices(
+    void        *hSglx,
+    const char  *devstring,
+    int         errlvl )
+{
+    return sglx_selectDevices( hSglx, devstring, errlvl );
 }
 
 

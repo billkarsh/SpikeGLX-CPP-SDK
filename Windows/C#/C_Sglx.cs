@@ -230,6 +230,22 @@ namespace C_Sglx_namespace
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_getNIShankMap(out int nval, IntPtr hSglx);
 
+// Get string with format: (OneBoxID,slot)...
+// - A parenthesized entry for each selected obx.
+// - OneBoxID: zero-based integer assigned by 'Detect'.
+// - slot: which OneBox by user-assigned slot.
+// - If no OneBoxes, return '()'.
+//
+        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        static extern int c_sglx_getOneBoxAddrs(out IntPtr intPtr, IntPtr hSglx);
+        public static int c_sglx_getOneBoxAddrs(out string list, IntPtr hSglx)
+        {
+            IntPtr  intPtr;
+            int     ret = c_sglx_getOneBoxAddrs(out intPtr, hSglx);
+            list = System.Runtime.InteropServices.Marshal.PtrToStringAnsi(intPtr);
+            return ret;
+        }
+
 // Get the most recently used run parameters.
 // These are a set of 'key=value' strings.
 // If successful, nval is the string count.
@@ -615,6 +631,32 @@ namespace C_Sglx_namespace
 //
         [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
         public static extern int c_sglx_pause_graphs(IntPtr hSglx, int pause);
+
+// This command:
+// 1. Opens the Configure Acquisition dialog.
+// 2. Checks boxes according to the devstring parameter.
+// 3. Clicks 'Detect', and if successful...
+// 4. Clicks 'Verify | Save'.
+//
+// - devstring enables Devices tab items:
+//    Format:        (device)...(device)
+//    Passive probe: (slot,port,PN,SN) e.g. (2,1,NP1200,12709120122)
+//    Regular probe: (slot,port,dock)  e.g. (2,1,1)
+//    OneBox XIO:    (slot,obx)        e.g. (21,obx)
+//    NI-DAQ:        (nidq)            e.g. (nidq)
+// - errlvl:
+//    1 = report severe errors
+//    2 = report errors and warnings (including broken shanks)
+//
+// Note:
+//    Here probes and OneBoxes are selected by physical address
+//    (slot,port,dock). However, parameters are set according to
+//    logical address (js,ip). After this call, use getProbeAddrs
+//    and getOneBoxAddrs to get the mappings between logical and
+//    physical addresses that 'Detect' assigns.
+//
+        [DllImport("SglxApi.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+        public static extern int c_sglx_selectDevices(IntPtr hSglx, [MarshalAs(UnmanagedType.LPStr)] string devstring, int errlvl);
 
 // Set anatomy data string with Pinpoint format:
 // [probe-id,shank-id](startpos,endpos,R,G,B,rgnname)...(startpos,endpos,R,G,B,rgnname)

@@ -283,6 +283,17 @@ SGLX_EXPORT bool SGLX_CALL sglx_getLastGT( int &g, int &t, void *hSglx )
 }
 
 
+SGLX_EXPORT bool SGLX_CALL sglx_getOneBoxAddrs( std::string &list, void *hSglx )
+{
+    Comm    C;
+
+    try {
+        return C.do1LineQuery( list, HS, "GETOBXADDRS", false );
+    }
+    CATCH()
+}
+
+
 SGLX_EXPORT bool SGLX_CALL sglx_getParams(
     T_sglx_get_strs     &kv,
     void                *hSglx )
@@ -1027,6 +1038,22 @@ SGLX_EXPORT bool SGLX_CALL sglx_pause_graphs( void *hSglx, bool pause )
 
     try {
         return C.doCommand( HS, cmd );
+    }
+    CATCH()
+}
+
+
+SGLX_EXPORT bool SGLX_CALL sglx_selectDevices(
+    void                *hSglx,
+    const std::string   &devstring,
+    int                 errlvl )
+{
+    Comm    C;
+    char    cmd[32];
+    sprintf( cmd, "SELECTDEVS %d ", errlvl );
+
+    try {
+        return C.doCommand( HS, string(cmd) + HS->cpp_get_str(devstring) );
     }
     CATCH()
 }

@@ -41,6 +41,11 @@ A C++ project typcally needs:
 
 4. Try some of the examples in 'DemoRemoteAPI.xxx.'
 
+latency_test() is a simple demonstration of real-time fetching and
+processing of streaming imec probe data.
+
+{wp_XXX.yyy} demonstrate calling the waveplayer from a script.
+
 
 Linux Tips
 ==========

@@ -375,6 +375,14 @@ SGLX_EXPORT bool SGLX_CALL sglx_getImecChanGains(
 //
 SGLX_EXPORT bool SGLX_CALL sglx_getLastGT( int &g, int &t, void *hSglx );
 
+// Get string with format: (OneBoxID,slot)...
+// - A parenthesized entry for each selected obx.
+// - OneBoxID: zero-based integer assigned by 'Detect'.
+// - slot: which OneBox by user-assigned slot.
+// - If no OneBoxes, return '()'.
+//
+SGLX_EXPORT bool SGLX_CALL sglx_getOneBoxAddrs( std::string &list, void *hSglx );
+
 // Get the most recently used run parameters.
 // These are (key,value) pairs.
 //
@@ -786,6 +794,34 @@ SGLX_EXPORT bool SGLX_CALL sglx_par2(
 // Note: The displays are updated at ~10 Hz.
 //
 SGLX_EXPORT bool SGLX_CALL sglx_pause_graphs( void *hSglx, bool pause );
+
+// This command:
+// 1. Opens the Configure Acquisition dialog.
+// 2. Checks boxes according to the devstring parameter.
+// 3. Clicks 'Detect', and if successful...
+// 4. Clicks 'Verify | Save'.
+//
+// - devstring enables Devices tab items:
+//    Format:        (device)...(device)
+//    Passive probe: (slot,port,PN,SN) e.g. (2,1,NP1200,12709120122)
+//    Regular probe: (slot,port,dock)  e.g. (2,1,1)
+//    OneBox XIO:    (slot,obx)        e.g. (21,obx)
+//    NI-DAQ:        (nidq)            e.g. (nidq)
+// - errlvl:
+//    1 = report severe errors
+//    2 = report errors and warnings (including broken shanks)
+//
+// Note:
+//    Here probes and OneBoxes are selected by physical address
+//    (slot,port,dock). However, parameters are set according to
+//    logical address (js,ip). After this call, use getProbeAddrs
+//    and getOneBoxAddrs to get the mappings between logical and
+//    physical addresses that 'Detect' assigns.
+//
+SGLX_EXPORT bool SGLX_CALL sglx_selectDevices(
+    void                *hSglx,
+    const std::string   &devstring,
+    int                 errlvl );
 
 // Set anatomy data string with Pinpoint format:
 // [probe-id,shank-id](startpos,endpos,R,G,B,rgnname...startpos,endpos,R,G,B,rgnname)
