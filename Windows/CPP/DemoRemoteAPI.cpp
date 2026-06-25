@@ -221,22 +221,39 @@ error:
 }
 
 
-// Continuously fetch LFP-band data from imec probe-0.
-// Threshold channel 393 @ 0.45 mV.
+// Continuously fetch data from imec probe-0.
+// Threshold selected meas_chan.
 // Send digital out command tracking threshold crossings.
 //
 // Runs until error or Ctrl-C.
 //
-// To measure closed-loop latency, immerse the probe in
-// saline and give it a square wave signal (1 mV p-p, 1 Hz).
-// We fetch all 384 channels of LFP data in a remote program.
+// To measure closed-loop latency, immerse the probe in saline
+// and give it a square wave signal (1 to 5 mV p-p, 10 Hz).
+//
+// We fetch 384 channels of these data in the remote program;
+// fetching performance is similar regardless of channel count.
+//
+// If the probe has an LF-band we'll use that so the 10 Hz signal
+// isn't too distorted, otherwise we'll fetch AP (full-band).
+//
 // We analyze one of these channels looking for a rising edge.
 // We then react to that threshold crossing by commanding an
 // NI device to make another edge that is sent to the probe's
-// SMA connector as a digital input. Now the separation between
-// the LFP threshold event and the resulting NI event gives a
-// direct readout of closed-loop latency. We measure the typical
-// closed-loop latency to be 5.5 ms using the Cpp API.
+// SMA connector as a digital input. The separation between
+// the threshold event and the resulting NI event gives a
+// direct readout of closed-loop latency. We measure the mean
+// closed-loop latency to be 2 to 3 ms.
+//
+// Note that the square wave amplitude and/or thresh voltage may
+// need to be adjusted until you are seeing a regular square
+// wave in the imec SY channel; not many edges missed, and not
+// too noisy.
+//
+// While running this script you can enable file writing in SpikeGLX,
+// and save a few minutes of recording. Get SpikeGLX_Datafile_Tools
+// from the SpikeGLX download site and use its latency_test_analysis
+// script to calculate latency statistics.
+// https://billkarsh.github.io/SpikeGLX/#post-processing-tools
 //
 void latency_test()
 {
@@ -246,25 +263,50 @@ void latency_test()
 
     if( sglx_connect( hSglx, addr, port ) ) {
 
-        cppClient_sglx_fetch    io;
-        double                  mv2i16  = 1.0/(1200.0/250/1024);
-        const char              *line   = "Dev4/port0/line5";
+        const char      *line = "Dev4/port0/line5";
+        unsigned int    bits = 0;
+
+        double                  i162V;
         t_ull                   fromCt;
-        unsigned int            bits    = 0;
-        int                     nC      = 385,
-                                id      = 393 - 384,
-                                thresh  = 0.45*mv2i16;
+        const short             *data;
+        cppClient_sglx_fetch    io;
+        cppClient_sglx_get_ints types;
+        int                     nLF,
+                                ch0,
+                                meas_chan,
+                                meas_idx,
+                                thresh,
+                                ndata;
+
+        io.n_cs = 384;
+        io.max_samps = 120;
+        io.downsample = 1;
+        io.js = 2;
+        io.ip = 0;
+
+        // Get [AP LF SY] channel counts for probe stream
+        sglx_getStreamAcqChans( types, hSglx, io.js, io.ip );
+        nLF = types.vint[1];
+
+        if( nLF > 0 ) {
+            ch0 = 384;
+            meas_chan = 393;    // arb chan in fetched set
+        }
+        else {
+            ch0 = 0;
+            meas_chan = 9;      // arb chan in fetched set
+        }
+
+        for( int i = 0; i < 384; ++i )
+            io.chans.push_back( ch0 + i );
+        io.channel_subset = &io.chans[0];
+
+        meas_idx = meas_chan - ch0;
+
+        sglx_getStreamI16ToVolts( i162V, hSglx, io.js, io.ip, meas_chan );
+        thresh = (int)(0.00025 / i162V);    // 0.25 mv as probe i16
 
         printf( "Threshold %d\n", thresh );
-
-        for( int i = 384; i < 769; ++i )
-            io.chans.push_back( i );
-        io.channel_subset = &io.chans[0];
-        io.n_cs         = nC;
-        io.max_samps    = 120;
-        io.downsample   = 1;
-        io.js           = 2;
-        io.ip           = 0;
 
         if( !(fromCt = sglx_getStreamSampleCount( hSglx, io.js, io.ip )) )
             goto error;
@@ -279,11 +321,11 @@ void latency_test()
             if( !(headCt = sglx_fetch( io, hSglx, fromCt )) )
                 goto error;
 
-            int tpts = io.data.size() / nC;
+            int tpts = io.data.size() / io.n_cs;
 
             if( tpts > 1 ) {
 
-                int     diff  = io.data[id + (tpts-1)*nC] - io.data[id];
+                int     diff  = io.data[meas_idx + (tpts-1)* io.n_cs] - io.data[meas_idx];
                 bool    digOK = true;
 
                 if( diff > thresh && bits == 0 ) {

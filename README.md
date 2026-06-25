@@ -23,11 +23,9 @@ Explicitly supported in this package:
 the wrapper calls*.
 
 There's an included closed-loop latency test program; used to obtain these
-results on an i7-8850H, 2.6 GHz laptop:
+results with an NP 2.0 probe:
 
 ![CPP API Latency](cpp_latency.png)
-
->*Note: Low latency mode is available with SpikeGLX 20230815 and later.*
 
 ### Who
 
