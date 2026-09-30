@@ -140,7 +140,7 @@ T_sglx_get_dbls::T_sglx_get_dbls()
 
 bool cppClient_sglx_set_ints::get_int( int &val, int j )
 {
-    if( j < vint.size() ) {
+    if( j < int(vint.size()) ) {
         val = vint[j];
         return true;
     }
@@ -216,7 +216,7 @@ T_sglx_set_keyvals::T_sglx_set_keyvals()
 
 short* cppClient_sglx_fetch::base_addr( int nshort )
 {
-    if( data.size() != nshort )
+    if( int(data.size()) != nshort )
         data.resize( nshort );
 
     return &data[0];
@@ -224,7 +224,7 @@ short* cppClient_sglx_fetch::base_addr( int nshort )
 
 short* cClient_sglx_fetch::base_addr( int nshort )
 {
-    if( data.size() != nshort )
+    if( int(data.size()) != nshort )
         data.resize( nshort );
 
     return &data[0];

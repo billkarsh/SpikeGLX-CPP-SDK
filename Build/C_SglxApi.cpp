@@ -13,7 +13,7 @@ using namespace std;
 
 SGLX_EXPORT const char* SGLX_CALL c_sglx_getstr( int *len, void *hSglx, int ith )
 {
-    if( ith < HS->xvstr.size() ) {
+    if( ith < int(HS->xvstr.size()) ) {
         *len = HS->xvstr[ith].size();
         return HS->xvstr[ith].c_str();
     }
@@ -25,7 +25,7 @@ SGLX_EXPORT const char* SGLX_CALL c_sglx_getstr( int *len, void *hSglx, int ith 
 
 SGLX_EXPORT int SGLX_CALL c_sglx_getint( void *hSglx, int ith )
 {
-    if( ith < HS->xvint.size() )
+    if( ith < int(HS->xvint.size()) )
         return HS->xvint[ith];
 
     return 0;
@@ -34,7 +34,7 @@ SGLX_EXPORT int SGLX_CALL c_sglx_getint( void *hSglx, int ith )
 
 SGLX_EXPORT double SGLX_CALL c_sglx_getdbl( void *hSglx, int ith )
 {
-    if( ith < HS->xvdbl.size() )
+    if( ith < int(HS->xvdbl.size()) )
         return HS->xvdbl[ith];
 
     return 0;

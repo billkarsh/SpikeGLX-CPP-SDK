@@ -10,7 +10,7 @@ TARGET = SglxApi
 TEMPLATE = lib
 
 win32 {
-    DESTDIR = C:/Users/labadmin/Desktop/SGLBUILD/FIXU/SpikeGLX-CPP-SDK/Windows/API
+    DESTDIR = C:/Users/billk/Desktop/SGLBUILD/FIXU/SpikeGLX-CPP-SDK/Windows/API
 }
 
 unix {
@@ -77,6 +77,6 @@ QMAKE_TARGET_COMPANY = Bill Karsh
 QMAKE_TARGET_PRODUCT = SglxApi
 QMAKE_TARGET_DESCRIPTION = SpikeGLX Com Link
 QMAKE_TARGET_COPYRIGHT = (c) 2025, Bill Karsh, All rights reserved
-VERSION = 1.6.0
+VERSION = 1.6.2
 
 

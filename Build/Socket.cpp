@@ -80,9 +80,10 @@ static inline void DO_STARTUP()
 
 #else   // UNIX
 
-#include <netinet/tcp.h>
 #include <arpa/inet.h>
+#include <netinet/tcp.h>
 #include <netdb.h>
+#include <poll.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 
@@ -325,10 +326,28 @@ uint Socket::receiveData( void *dst, uint dstBytes ) noexcept(false)
 }
 
 
+// Return true if any unread bytes.
+//
+// Sep 29, 2026: Modified per Matthias Klumpp to prefer poll() over select(), at
+// least for UNIX, avoiding FD_SET memory corruption when m_sock >= FD_SETSIZE.
+// More here: https://beesbuzz.biz/code/5739-The-problem-with-select-vs.-poll.
+//
+// poll() has implementation bugs prior to Windows 10, so select is preferred for
+// Windows builds.
+//
+// Poll and select are level rather than edge-event detectors in that they return true
+// if any bytes are pending in the buffer, not only if bytes are newly arrived. At this
+// time, poll is a simple drop-in replacement for select. Any future event-based scheme
+// will require downstream modifications beyond this function.
+//
 bool Socket::waitData( uint waitMS ) noexcept(false)
 {
     if( !isValid() )
         return false;
+
+    int ret;
+
+#ifdef WIN32
 
     int sec = waitMS / 1000,
         ms  = waitMS - 1000 * sec;
@@ -341,7 +360,23 @@ bool Socket::waitData( uint waitMS ) noexcept(false)
     FD_ZERO( &readfds );
     FD_SET( m_sock, &readfds );
 
-    int ret = select( m_sock + 1, &readfds, 0, 0, &tv );
+    ret = select( m_sock + 1, &readfds, 0, 0, &tv );
+
+#else   // UNIX
+
+    struct pollfd   pfd;
+    pfd.fd      = m_sock;
+    pfd.events  = POLLIN;
+    pfd.revents = 0;
+
+    ret = poll( &pfd, 1, waitMS );
+
+    if( ret > 0 && (pfd.revents& POLLNVAL) ) {
+        m_error = "waitData: Invalid socket.";
+        throw std::runtime_error( m_error );
+    }
+
+#endif
 
 // Ready
     if( ret > 0 )

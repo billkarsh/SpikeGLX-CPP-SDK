@@ -195,7 +195,7 @@ SGLX_EXPORT t_ull SGLX_CALL sglx_fetchLatest( T_sglx_fetch &io, void *hSglx )
 
     int max_samps = io.max_samps;
 
-    if( max_samps > cur_samps )
+    if( max_samps > int(cur_samps) )
         max_samps = cur_samps;
 
     return sglx_fetch( io, hSglx, cur_samps - max_samps );
