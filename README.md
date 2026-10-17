@@ -29,9 +29,9 @@ results with an NP 2.0 probe:
 
 ### Who
 
-The SDK is developed by [Bill Karsh](https://www.janelia.org/people/bill-karsh)
-of the [Tim Harris Lab](https://www.janelia.org/lab/harris-lab-apig) at
-HHMI/Janelia Research Campus.
+The SDK is developed by Bill Karsh of the Tim Harris lab.
+Initially hosted/funded by HHMI. Currently supported by {NIH, Wellcome Trust}
+grants via {JHU, UCL}.
 
 ### Building in Windows
 
